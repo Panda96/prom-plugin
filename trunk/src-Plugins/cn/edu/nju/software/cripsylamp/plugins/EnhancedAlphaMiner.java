@@ -1,15 +1,14 @@
 package cn.edu.nju.software.cripsylamp.plugins;
 
-import org.deckfour.xes.model.XLog;
+import cn.edu.nju.software.cripsylamp.beans.Trace;
+import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
-import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
-import org.processmining.framework.plugin.annotations.PluginVariant;
 
 public class EnhancedAlphaMiner {
     @Plugin(
             name = "Enhanced Alpha Miner Plugin",
-            parameterLabels = {"Log"},
+            parameterLabels = {"Traces"},
             returnLabels = {"String"},
             returnTypes = {String.class},
             userAccessible = true,
@@ -21,9 +20,8 @@ public class EnhancedAlphaMiner {
             email = "151250206@smail.nju.edu.cn"
     )
 
-    @PluginVariant(requiredParameterLabels = {0})
-    public static String helloWorld(PluginContext context, XLog log) {
+    public static String helloWorld(UIPluginContext context, Trace traces) {
 
-        return "Hello World" + log.getGlobalEventAttributes().get(0).getKey() + log.getGlobalTraceAttributes().get(0).getKey();
+        return "Hello World";
     }
 }
