@@ -1,8 +1,9 @@
-package org.processmining.plugins;
+package cn.edu.nju.software.cripsylamp.plugins;
 
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
+
 
 public class HelloWorld {
         @Plugin(
@@ -19,6 +20,7 @@ public class HelloWorld {
                 email = "My e-mail address"
         )
         public static String helloWorld(PluginContext context) {
-                return "Hello World";
+
+            return "Hello World";
         }
 }

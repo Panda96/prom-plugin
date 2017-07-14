@@ -1,4 +1,4 @@
-package org.processmining.plugins;
+package cn.edu.nju.software.cripsylamp.plugins;
 
 import java.util.Collection;
 import java.util.List;
