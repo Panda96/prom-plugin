@@ -18,21 +18,21 @@ import java.util.Map;
 @Plugin(
         name = "Import Txt for Enhanced Alpha Miner Plugin",
         parameterLabels = {"Map File"},
-        returnLabels = {".map"},
+        returnLabels = {"MapFile"},
         returnTypes = { Map.class })
-@UIImportPlugin(description = "Generate map",extensions = ".map")
+@UIImportPlugin(description = "Generate map",extensions = "map")
 public class ImportForEnhancedAlphaMiner extends AbstractImportPlugin{
     @Override
-    protected Map<String,String> importFromStream(PluginContext context, java.io.InputStream input, String filename, long fileSizeInBytes) throws Exception {
+    protected Object importFromStream(PluginContext context, java.io.InputStream input, String filename, long fileSizeInBytes) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         Map<String,String> result = new HashMap<>();
         String line = "",caseID = "",trace = "";
         try {
             while((line = reader.readLine())!=null) {
                 String[] splitStr = line.split("\t");
-                if(splitStr.length==2) {
-                    caseID = splitStr[0];
-                    trace = splitStr[1];
+                if(splitStr.length==3) {
+                    caseID = splitStr[1];
+                    trace = splitStr[2];
                     result.put(caseID,trace);
                 }
             }
