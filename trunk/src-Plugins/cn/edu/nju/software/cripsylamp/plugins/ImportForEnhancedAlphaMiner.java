@@ -33,7 +33,7 @@ public class ImportForEnhancedAlphaMiner extends AbstractImportPlugin {
                 if (splitStr.length == 3) {
                     caseID = splitStr[1];
                     trace = splitStr[2];
-                    result.put(caseID, trace);
+                    result.put(caseID, trace.replace(" ", ""));
                 }
             }
             System.out.println(result.keySet());

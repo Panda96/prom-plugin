@@ -10,18 +10,18 @@ public class Component {
     /**
      * 名字
      */
-    protected String name;
+    protected Character name;
     /**
      * 接下来的元素
      */
     protected List<Component> next;
 
-    public Component(String name) {
+    public Component(Character name) {
         this.name = name;
         next = new ArrayList<>();
     }
 
-    public String getName() {
+    public Character getName() {
         return name;
     }
 
@@ -36,5 +36,20 @@ public class Component {
      */
     public void addComponent(Component component) {
         next.add(component);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Component)) return false;
+
+        Component component = (Component) o;
+
+        return name.equals(component.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }
