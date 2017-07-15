@@ -11,6 +11,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * Created by keenan on 15/07/2017.
+ */
 public class EnhancedAlphaMiner {
 
 

@@ -19,7 +19,9 @@ import java.util.Map;
 @UIImportPlugin(
         description = "GenerateTrace",
         extensions = "tra")
-
+/**
+ * Created by CYF and keenan on 2017/7/15.
+ */
 public class ImportForEnhancedAlphaMiner extends AbstractImportPlugin {
     @Override
     protected Trace importFromStream(PluginContext context, java.io.InputStream input, String filename, long fileSizeInBytes) {
