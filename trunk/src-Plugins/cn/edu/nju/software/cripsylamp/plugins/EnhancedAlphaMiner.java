@@ -5,6 +5,7 @@ import cn.edu.nju.software.cripsylamp.util.Tuple;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.annotations.Plugin;
+import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,8 +17,8 @@ public class EnhancedAlphaMiner {
     @Plugin(
             name = "Enhanced Alpha Miner Plugin",
             parameterLabels = {"Traces"},
-            returnLabels = {"String"},
-            returnTypes = {String.class},
+            returnLabels = {"Petrinet"},
+            returnTypes = {Petrinet.class},
             userAccessible = true,
             help = "Enhanced Alpha Miner Plugin"
     )
@@ -27,7 +28,7 @@ public class EnhancedAlphaMiner {
             email = "151250206@smail.nju.edu.cn"
     )
 
-    public static String helloWorld(UIPluginContext context, Trace traces) {
+    public static Petrinet helloWorld(UIPluginContext context, Trace traces) {
         Set<Character> tSet = new HashSet<>();
         Set<Character> start = new HashSet<>();
         Set<Character> end = new HashSet<>();
@@ -90,15 +91,10 @@ public class EnhancedAlphaMiner {
             while (iterator.hasNext()) {
                 Tuple tuple = iterator.next();
 
-//                if (!tuple.isUsing()) continue;
-
                 for (Tuple each : Xw) {
-//                    if (!each.isUsing()) continue;
                     if (tuple.leftEquals(each)) {
                         if (!traces.belongs2SameTrace(tuple.getRightPart(), each.getRightPart())) {
-//                            if(temp.contains())
                             temp.add(tuple.rightUnion(each));
-//                            System.out.println("Left tuple = " + tuple.toString());
                             differentResult = true;
                             continue;
                         }
@@ -106,11 +102,9 @@ public class EnhancedAlphaMiner {
                 }
 
                 for (Tuple each : Xw) {
-//                    if (!each.isUsing()) continue;
                     if (tuple.rightEquals(each)) {
                         if (!traces.belongs2SameTrace(tuple.getLeftPart(), each.getLeftPart())) {
                             temp.add(tuple.leftUnion(each));
-//                            System.out.println("Right tuple = " + tuple.toString());
                             differentResult = true;
                             continue;
                         }
@@ -119,13 +113,6 @@ public class EnhancedAlphaMiner {
             }
 
             Set<Tuple> tmp2 = new HashSet<>(temp);
-
-            System.out.println("===============================================");
-            for (Tuple tuple : Xw) {
-                if (tuple.isUsing())
-                    System.out.println(tuple.toString());
-            }
-            System.out.println("===============================================");
 
             for (Tuple outT : Xw) {
                 boolean containflag = false;
@@ -137,24 +124,15 @@ public class EnhancedAlphaMiner {
                 }
                 if (!containflag) {
                     tmp2.add(outT);
-                    System.out.println(outT.toString());
                 }
             }
 
-            if (i <= 2)
-                System.out.println("=========================");
-            i++;
             Xw = tmp2;
 
         }
 
-        for (Tuple tuple : Xw) {
-            if (tuple.isUsing())
-                System.out.println(tuple.toString());
-        }
-
-
-        return "Hello World";
+        EnhancedAlphaMinerView view = new EnhancedAlphaMinerView();
+        return view.makePetriNet(Xw,start,end);
     }
 
 }
