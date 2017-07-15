@@ -28,7 +28,7 @@ public class EnhancedAlphaMiner {
             email = "151250206@smail.nju.edu.cn"
     )
 
-    public static Petrinet helloWorld(UIPluginContext context, Trace traces) {
+    public static Petrinet enhancedAlphaMiner(UIPluginContext context, Trace traces) {
         Set<Character> tSet = new HashSet<>();
         Set<Character> start = new HashSet<>();
         Set<Character> end = new HashSet<>();
@@ -83,7 +83,6 @@ public class EnhancedAlphaMiner {
 
         boolean differentResult = true;
 
-        int i = 0;
         while (differentResult) {
             differentResult = false;
             Set<Tuple> temp = new HashSet<>();
@@ -128,11 +127,10 @@ public class EnhancedAlphaMiner {
             }
 
             Xw = tmp2;
-
         }
 
         EnhancedAlphaMinerView view = new EnhancedAlphaMinerView();
-        return view.makePetriNet(Xw,start,end);
+        return view.makePetriNet(Xw, start, end);
     }
 
 }
