@@ -76,7 +76,7 @@ public class EnhancedAlphaMinerView {
 
         for (int[] each : PVSa) {
             Place place = ori.addPlace("p" + placeCnt++);
-            for (int i = 0; i < each.length; i++) {
+            for (int i = 0; i < each.length - 1; i++) {
                 char label = (char) ('A' + i);
                 if (each[i] == 1) {
                     ori.addArc(tansitionMap.get(label + ""), place);

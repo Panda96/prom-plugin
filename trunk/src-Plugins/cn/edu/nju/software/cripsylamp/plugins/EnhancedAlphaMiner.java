@@ -191,6 +191,60 @@ public class EnhancedAlphaMiner {
                 MatrixCalculator.T_matrix
                         (MatrixCalculator.matrixSet2Array(t_avail)));
 
+        int avaiSize = t_avail.size();
+        int miniSize = basic.getTransitions().size() + 1 - avaiSize;
+        Set<int[]> minimalPvs = new HashSet<>();
+        for (int[] each : pvs) {
+            if (permitIn(minimalPvs, each)) {
+                minimalPvs.add(each);
+            }
+            if (minimalPvs.size() == miniSize) {
+                break;
+            }
+        }
+
+//        Main.Rank(MatrixCalculator.matrixSet2Array(minimalPvs));
+        System.out.println(minimalPvs.isEmpty());
+        for (int[] each : minimalPvs) {
+            for (int i : each) {
+                System.out.print(i + "\t");
+            }
+            System.out.println();
+        }
+
+        // 化为上三角
+        for (int[] each : minimalPvs) {
+            Set<int[]> all = new HashSet<>();
+            all.addAll(minimalPvs);
+            all.remove(each);
+            for (int i = 0; i < minimalPvs.size(); i++)
+                for (int[] a : all) {
+                    int[] sum = addTwoArray(each, a);
+                    if (judgeOne(sum)) {
+                        if (numOfZeros(sum) > numOfZeros(each)) {
+                            replaceAll(each, sum);
+                        }
+                    }
+
+                    sum = differenceTwoArray(each, a);
+                    if (judgeOne(sum)) {
+                        if (numOfZeros(sum) > numOfZeros(each)) {
+                            replaceAll(each, sum);
+                        }
+                    }
+                }
+        }
+
+//        System.out.println("--------------");
+//        System.out.println(minimalPvs.isEmpty());
+//
+//        for (int[] each : minimalPvs) {
+//            for (int i : each) {
+//                System.out.print(i + "\t");
+//            }
+//            System.out.println();
+//        }
+
 //        for (int[] each : pvs) {
 //            for (int i : each) {
 //                System.out.print(i + " ");
@@ -216,34 +270,42 @@ public class EnhancedAlphaMiner {
 //        }
 
         int[][] non_avail = MatrixCalculator.matrixSet2Array(t_invariant);
+        if (non_avail == null) {
+            return basic;
+        }
 
-        for (int i = 0; i < non_avail.length; i++) {
-            for (int j = 0; j < non_avail[i].length; j++) {
-                System.out.print(non_avail[i][j] + "\t");
-            }
-            System.out.println();
+//        for (int i = 0; i < non_avail.length; i++) {
+//            for (int j = 0; j < non_avail[i].length; j++) {
+//                System.out.print(non_avail[i][j] + "\t");
+//            }
+//            System.out.println();
+//        }
+
+        for (int[] each : minimalPvs) {
+            positiveFirst(each);
         }
 
         Set<int[]> pvsa = new HashSet<>();
-        for (int[] each : pvs) {
+        for (int[] each : minimalPvs) {
             if (!MatrixCalculator.checkZero(non_avail, each)) {
                 pvsa.add(each);
             }
         }
 
-        Set<int[]> pvse = new HashSet<>();
-        pvse.addAll(pvsa);
-        pvse.addAll(MatrixCalculator.array2MatrixSet(matrix));
+//        Set<int[]> pvse = new HashSet<>();
+//        pvse.addAll(pvsa);
+//        pvse.addAll(MatrixCalculator.array2MatrixSet(matrix));
 
-        System.out.println("=================");
-        for (int[] each : pvse) {
-            for (int i : each) {
-                System.out.print(i + " ");
-            }
-            System.out.println();
-        }
+//        System.out.println("=================");
+//        for (int[] each : pvse) {
+//            for (int i : each) {
+//                System.out.print(i + " ");
+//            }
+//            System.out.println();
+//        }
 
         view.addLostPlaces(pvsa, basic);
+
         return basic;
     }
 
@@ -333,5 +395,116 @@ public class EnhancedAlphaMiner {
 //        return new ArrayList<>();
 //    }
 
+    private boolean permitIn(Set<int[]> pool, int[] data) {
+        if (pool.size() == 0) {
+            return true;
+        }
+        Set<int[]> set1 = new HashSet<>();
+        Set<int[]> set2 = new HashSet<>();
+        Set<int[]> setAll = new HashSet<>();
+        set1.addAll(pool);
+        setAll.addAll(pool);
+        int i = 1;
+        while (i <= pool.size()) {
+            for (int[] each : set1) {
+                for (int[] pooleach : pool) {
+                    int[] sum = addTwoArray(each, pooleach);
+                    if (judgeSame(sum, data)) {
+                        return false;
+                    }
+                    if (judgeOne(sum)) {
+                        set2.add(sum);
+                        setAll.add(sum);
+                    }
+                    sum = differenceTwoArray(each, sum);
+                    if (judgeSame(sum, data)) {
+                        return false;
+                    }
+                    if (judgeOne(sum)) {
+                        set2.add(sum);
+                        setAll.add(sum);
+                    }
+                    sum = differenceTwoArray(sum, each);
+                    if (judgeSame(sum, data)) {
+                        return false;
+                    }
+                    if (judgeOne(sum)) {
+                        set2.add(sum);
+                        setAll.add(sum);
+                    }
+                }
+            }
+            set1 = set2;
+            set2 = new HashSet<>();
+            i++;
+        }
+        return true;
+    }
 
+    private int[] addTwoArray(int[] a1, int[] a2) {
+        int[] result = new int[a1.length];
+        for (int i = 0; i < a1.length; i++) {
+            result[i] = a1[i] + a2[i];
+        }
+        return result;
+    }
+
+    private boolean judgeOne(int[] tmp) {
+        for (int each : tmp) {
+            if (each > 1 || each < -1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private int[] differenceTwoArray(int[] a1, int[] a2) {
+        int[] result = new int[a1.length];
+        for (int i = 0; i < a1.length; i++) {
+            result[i] = a1[i] - a2[i];
+        }
+        return result;
+    }
+
+    private boolean judgeSame(int[] a1, int[] a2) {
+        for (int i = 0; i < a1.length; i++) {
+            if (a1[i] != a2[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private int numOfZeros(int[] a) {
+        int sum = 0;
+        for (int i : a) {
+            if (i == 0) {
+                sum++;
+            }
+        }
+
+        return sum;
+    }
+
+    private void replaceAll(int[] a, int[] b) {
+        for (int i = 0; i < a.length; i++) {
+            a[i] = b[i];
+        }
+    }
+
+    private void positiveFirst(int[] a) {
+        boolean posiFirst = true;
+        for (int i = 0; i < a.length; i++) {
+            if (a[i] == -1) {
+                posiFirst = false;
+                break;
+            } else if (a[i] == 1) {
+                break;
+            }
+        }
+        if (!posiFirst)
+            for (int i = 0; i < a.length; i++) {
+                a[i] = -a[i];
+            }
+    }
 }

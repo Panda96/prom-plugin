@@ -150,6 +150,9 @@ public class MatrixCalculator {
 
 
     public static int[][] matrixSet2Array(Set<int[]> set) {
+        if (set.isEmpty()) {
+            return null;
+        }
         Iterator<int[]> iterator = set.iterator();
         int[] first = iterator.next();
         int[][] result = new int[set.size()][first.length];
