@@ -6,6 +6,7 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetFactory;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -55,11 +56,34 @@ public class EnhancedAlphaMinerView {
             }
         }
         //add transition into net for end place
-        Place endPlace = resultNet.addPlace("p"+num++);
-        for(char each:end){
-            resultNet.addArc(transitionMap.get(each),endPlace);
+        Place endPlace = resultNet.addPlace("p" + num++);
+        for (char each : end) {
+            resultNet.addArc(transitionMap.get(each), endPlace);
         }
 
         return resultNet;
+    }
+
+    public void addLostPlaces(Set<int[]> PVSa, Petrinet ori) {
+        Collection<Transition> all = ori.getTransitions();
+        Collection<Place> placeCollection = ori.getPlaces();
+        int placeCnt = placeCollection.size();
+        Map<String, Transition> tansitionMap = new HashMap<>();
+
+        for (Transition transition : all) {
+            tansitionMap.put(transition.getLabel(), transition);
+        }
+
+        for (int[] each : PVSa) {
+            Place place = ori.addPlace("p" + placeCnt++);
+            for (int i = 0; i < each.length; i++) {
+                char label = (char) ('A' + i);
+                if (each[i] == 1) {
+                    ori.addArc(tansitionMap.get(label + ""), place);
+                } else if (each[i] == -1) {
+                    ori.addArc(place, tansitionMap.get(label + ""));
+                }
+            }
+        }
     }
 }
