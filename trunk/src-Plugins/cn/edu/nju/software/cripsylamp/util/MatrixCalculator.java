@@ -82,20 +82,12 @@ public class MatrixCalculator {
         for (int i = 0; i < each.length; i++) {
             each[i] = 0;
         }
-        return traverseLeftCalc(each,0,right);
+        return traverseLeftCalc(each, 0, right);
     }
 
     private static Set<int[]> traverseLeftCalc(int[] left, int position, int[][] right) {
         Set<int[]> result = new HashSet<>();
         if (position == left.length) {
-            if(left[left.length-1]!=1){
-                return result;
-            }
-            for(int x:left){
-                if(x<0){
-                    return result;
-                }
-            }
             int num = 0;
             for (int y = 0; y < right[0].length; y++) {
                 for (int x = 0; x < left.length; x++) {
@@ -154,6 +146,57 @@ public class MatrixCalculator {
         right[pos] = -1;
         tmp.addAll(traverseRightCal(left, right.clone(), pos + 1));
         return tmp;
+    }
+
+
+    public static int[][] matrixSet2Array(Set<int[]> set) {
+        Iterator<int[]> iterator = set.iterator();
+        int[] first = iterator.next();
+        int[][] result = new int[set.size()][first.length];
+
+        int line = 0;
+        for (int[] each : set) {
+            for (int i = 0; i < each.length; i++) {
+                result[line][i] = each[i];
+            }
+            line++;
+        }
+
+        return result;
+    }
+
+    public static Set<int[]> array2MatrixSet(int[][] matrix) {
+        Set<int[]> result = new HashSet<>();
+
+        for (int i = 0; i < matrix.length; i++) {
+            result.add(matrix[i]);
+        }
+
+        return result;
+    }
+
+    public static int[][] T_matrix(int[][] matrix) {
+        int[][] result = new int[matrix[0].length][matrix.length];
+        for (int x = 0; x < matrix[0].length; x++) {
+            for (int y = 0; y < matrix.length; y++) {
+                result[x][y] = matrix[y][x];
+            }
+        }
+        return result;
+    }
+
+    public static boolean checkZero(int[][] a, int[] b) {
+        for (int i = 0; i < a.length; i++) {
+            int sum = 0;
+            for (int j = 0; j < a[0].length; j++) {
+                sum += (a[i][j] * b[j]);
+            }
+
+            if (sum != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

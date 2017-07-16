@@ -161,32 +161,100 @@ public class EnhancedAlphaMiner {
             }
         }
 
-        for (int[] each : t_invariant) {
-            for (int i : each) {
-                System.out.print(i + "\t");
+//        for (int[] each : t_invariant) {
+//            for (int i : each) {
+//                System.out.print(i + "\t");
+//            }
+//            System.out.println();
+//        }
+        Set<int[]> t_avail = generateAvail(traces, t_invariant);
+        t_invariant.removeAll(t_avail);
+
+//        for (int[] each : t_avail) {
+//            for (int i : each) {
+//                System.out.print(i + "\t");
+//            }
+//            System.out.println();
+//        }
+//
+//
+//        System.out.println("====");
+//
+//        for (int[] each : t_invariant) {
+//            for (int i : each) {
+//                System.out.print(i + "\t");
+//            }
+//            System.out.println();
+//        }
+
+        Set<int[]> pvs = MatrixCalculator.leftCalculate(
+                MatrixCalculator.T_matrix
+                        (MatrixCalculator.matrixSet2Array(t_avail)));
+
+//        for (int[] each : pvs) {
+//            for (int i : each) {
+//                System.out.print(i + " ");
+//            }
+//            System.out.println();
+//        }
+//        Set<int[]> p_tmp = MatrixCalculator.leftCalculate(matrix);
+//        Set<int[]> p_invariant = new HashSet<>();
+//        for (int[] each : p_tmp) {
+//            if (each[each.length - 1] != 1) {
+//                continue;
+//            }
+//            boolean allPositive = true;
+//            for (int i : each) {
+//                if (i < 0) {
+//                    allPositive = false;
+//                    break;
+//                }
+//            }
+//            if (allPositive) {
+//                p_invariant.add(each);
+//            }
+//        }
+
+        int[][] non_avail = MatrixCalculator.matrixSet2Array(t_invariant);
+
+        for (int i = 0; i < non_avail.length; i++) {
+            for (int j = 0; j < non_avail[i].length; j++) {
+                System.out.print(non_avail[i][j] + "\t");
             }
             System.out.println();
         }
 
-        System.out.println("====");
-        Set<int[]> p_invariant = MatrixCalculator.leftCalculate(matrix);
+        Set<int[]> pvsa = new HashSet<>();
+        for (int[] each : pvs) {
+            if (!MatrixCalculator.checkZero(non_avail, each)) {
+                pvsa.add(each);
+            }
+        }
 
-        for (int[] each : generateAvail(traces, t_invariant)) {
+        Set<int[]> pvse = new HashSet<>();
+        pvse.addAll(pvsa);
+        pvse.addAll(MatrixCalculator.array2MatrixSet(matrix));
+
+        System.out.println("=================");
+        for (int[] each : pvse) {
             for (int i : each) {
-                System.out.print(i + "\t");
+                System.out.print(i + " ");
             }
             System.out.println();
         }
 
+        view.addLostPlaces(pvsa, basic);
         return basic;
     }
 
     private Set<int[]> generateAvail(Trace trace, Set<int[]> Tiw) {
         Set<int[]> avail = new HashSet<>();
+//        Set<int[]> navail = new HashSet<>();
         Collection<String> traces = trace.getTraces().values();
 
         for (int[] each : Tiw) {
             String tmp = "";
+//            boolean hasAdd=false;
             for (int i = 0; i < each.length - 1; i++) {
                 if (each[i] == 1)
                     tmp += (char) ('A' + i);
@@ -194,10 +262,17 @@ public class EnhancedAlphaMiner {
             for (String eachTrace : traces) {
                 if (isInTrace(eachTrace, tmp)) {
                     avail.add(each);
+//                    hasAdd=true;
                     break;
                 }
             }
+//            if(!hasAdd){
+//                navail.add(each);
+//            }
         }
+//        int[][] availArray = new int[avail.size()][avail.iterator().next().length];
+//        Set<int[]> PVS = MatrixCalculator.leftCalculate(availArray);
+
         return avail;
     }
 
