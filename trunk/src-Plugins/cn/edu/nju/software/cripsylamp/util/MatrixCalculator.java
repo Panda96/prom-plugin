@@ -3,7 +3,6 @@ package cn.edu.nju.software.cripsylamp.util;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
-import org.processmining.models.graphbased.directed.petrinet.elements.Arc;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 
@@ -13,7 +12,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Created by CYF on 2017/7/16.
+ * Created by CYF and keenan on 2017/7/16.
  */
 public class MatrixCalculator {
     public static int[][] transformNet2Matrix(Petrinet net) {
@@ -47,7 +46,7 @@ public class MatrixCalculator {
             Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> arcCollection = net.getInEdges(p);
             for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> each : arcCollection) {
                 PetrinetNode t = each.getSource();
-                int yPosition = t.getLabel().charAt(0) > 'A' && t.getLabel().charAt(0) < 'Z' ? t.getLabel().charAt(0) - 'A' : t.getLabel().charAt(0) - 'a';
+                int yPosition = t.getLabel().charAt(0) >= 'A' && t.getLabel().charAt(0) <= 'Z' ? t.getLabel().charAt(0) - 'A' : t.getLabel().charAt(0) - 'a';
                 resultMatrix[xPosition][yPosition] = 1;
             }
             if (arcCollection.size() == 0) {
@@ -57,7 +56,7 @@ public class MatrixCalculator {
             arcCollection = net.getOutEdges(p);
             for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> each : arcCollection) {
                 PetrinetNode t = each.getTarget();
-                int yPosition = t.getLabel().charAt(0) > 'A' && t.getLabel().charAt(0) < 'Z' ? t.getLabel().charAt(0) - 'A' : t.getLabel().charAt(0) - 'a';
+                int yPosition = t.getLabel().charAt(0) >= 'A' && t.getLabel().charAt(0) <= 'Z' ? t.getLabel().charAt(0) - 'A' : t.getLabel().charAt(0) - 'a';
                 resultMatrix[xPosition][yPosition] = -1;
             }
             if (arcCollection.size() == 0) {
@@ -79,7 +78,6 @@ public class MatrixCalculator {
         if (right == null) {
             return new HashSet<>();
         }
-        Set<int[]> result = new HashSet<>();
         int[] each = new int[right.length];
         for (int i = 0; i < each.length; i++) {
             each[i] = 0;
@@ -118,6 +116,47 @@ public class MatrixCalculator {
         return result;
     }
 
+    public static Set<int[]> rightCalculate(int[][] left) {
+        Set<int[]> all = new HashSet<>();
+        if (left == null) {
+            return all;
+        }
+        int[] each = new int[left[0].length];
+        for (int i = 0; i < each.length; i++) {
+            each[0] = 0;
+        }
+
+        all = traverseRightCal(left, each, 0);
+        return all;
+    }
+
+    private static Set<int[]> traverseRightCal(int[][] left, int[] right, int pos) {
+        Set<int[]> tmp = new HashSet<>();
+
+        if (pos == right.length) {
+            int sum = 0;
+            for (int i = 0; i < left.length; i++) {
+                for (int j = 0; j < left[0].length; j++) {
+                    sum += (left[i][j] * right[j]);
+                }
+                if (sum != 0) {
+                    return tmp;
+                }
+            }
+
+            tmp.add(right.clone());
+            return tmp;
+        }
+
+        tmp.addAll(traverseRightCal(left, right.clone(), pos + 1));
+        right[pos] = 1;
+        tmp.addAll(traverseRightCal(left, right.clone(), pos + 1));
+        right[pos] = -1;
+        tmp.addAll(traverseRightCal(left, right.clone(), pos + 1));
+        return tmp;
+    }
+
+
 //    public static void main(String[] args){
 //        int[][] array={
 //            {-1,0,0,0,0,0,0,0,1},
@@ -137,9 +176,4 @@ public class MatrixCalculator {
 //            System.out.println();
 //        }
 //    }
-    /**
-     *
-     1	1	0	1	1	0	1	0	1
-     1	0	1	0	0	1	0	1	1
-     */
 }
