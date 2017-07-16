@@ -45,7 +45,7 @@ public class Petrinet2Matrix {
             Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> arcCollection = net.getInEdges(p);
             for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> each : arcCollection) {
                 PetrinetNode t = each.getSource();
-                int yPosition = t.getLabel().charAt(0) - 'A';
+                int yPosition = t.getLabel().charAt(0)>'A'&&t.getLabel().charAt(0)<'Z'? t.getLabel().charAt(0) - 'A':t.getLabel().charAt(0) - 'a';
                 resultMatrix[xPosition][yPosition] = 1;
             }
             if (arcCollection.size() == 0) {
@@ -55,7 +55,7 @@ public class Petrinet2Matrix {
             arcCollection = net.getOutEdges(p);
             for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> each : arcCollection) {
                 PetrinetNode t = each.getTarget();
-                int yPosition = t.getLabel().charAt(0) - 'A';
+                int yPosition = t.getLabel().charAt(0)>'A'&&t.getLabel().charAt(0)<'Z'? t.getLabel().charAt(0) - 'A':t.getLabel().charAt(0) - 'a';
                 resultMatrix[xPosition][yPosition] = -1;
             }
             if (arcCollection.size() == 0) {
