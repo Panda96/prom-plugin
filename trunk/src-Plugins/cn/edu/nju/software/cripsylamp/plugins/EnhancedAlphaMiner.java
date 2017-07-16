@@ -296,13 +296,13 @@ public class EnhancedAlphaMiner {
 //        pvse.addAll(pvsa);
 //        pvse.addAll(MatrixCalculator.array2MatrixSet(matrix));
 
-//        System.out.println("=================");
-//        for (int[] each : pvse) {
-//            for (int i : each) {
-//                System.out.print(i + " ");
-//            }
-//            System.out.println();
-//        }
+        System.out.println("=================");
+        for (int[] each : pvsa) {
+            for (int i : each) {
+                System.out.print(i + " ");
+            }
+            System.out.println();
+        }
 
         view.addLostPlaces(pvsa, basic);
 
@@ -450,6 +450,28 @@ public class EnhancedAlphaMiner {
     }
 
     private boolean judgeOne(int[] tmp) {
+        int number = 0;
+        boolean allsame = true;
+        for(int each:tmp){
+            if(each!=0&&number!=0){
+                if(Math.abs(each)!=number){
+                    allsame = false;
+                    break;
+                }
+            }
+            if(each!=0&&number==0){
+                number=Math.abs(each);
+            }
+        }
+        if(number==0){
+            return false;
+        }
+        if(allsame&&number!=0){
+            for (int i=0;i<tmp.length;i++) {
+                tmp[i]/=number;
+            }
+            return true;
+        }
         for (int each : tmp) {
             if (each > 1 || each < -1) {
                 return false;
