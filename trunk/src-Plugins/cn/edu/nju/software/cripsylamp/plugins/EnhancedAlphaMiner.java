@@ -1,12 +1,14 @@
 package cn.edu.nju.software.cripsylamp.plugins;
 
 import cn.edu.nju.software.cripsylamp.beans.Trace;
+import cn.edu.nju.software.cripsylamp.util.MatrixCalculator;
 import cn.edu.nju.software.cripsylamp.util.Tuple;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -31,7 +33,7 @@ public class EnhancedAlphaMiner {
             email = "151250206@smail.nju.edu.cn"
     )
 
-    public static Petrinet enhancedAlphaMiner(UIPluginContext context, Trace traces) {
+    public Petrinet enhancedAlphaMiner(UIPluginContext context, Trace traces) {
         Set<Character> tSet = new HashSet<>();
         Set<Character> start = new HashSet<>();
         Set<Character> end = new HashSet<>();
@@ -133,7 +135,128 @@ public class EnhancedAlphaMiner {
         }
 
         EnhancedAlphaMinerView view = new EnhancedAlphaMinerView();
-        return view.makePetriNet(Xw, start, end);
+
+        Petrinet basic = view.makePetriNet(Xw, start, end);
+
+        int[][] matrix = MatrixCalculator.transformNet2Matrix(basic);
+
+        Set<int[]> t_tmp = MatrixCalculator.rightCalculate(matrix);
+        Set<int[]> t_invariant = new HashSet<>();
+
+        for (int[] each : t_tmp) {
+            int tmp = 0;
+            for (char c : start) {
+                tmp |= each[c >= 'A' ? c - 'A' : c - 'a'];
+            }
+
+            boolean allPositive = true;
+            for (int i : each) {
+                if (i < 0) {
+                    allPositive = false;
+                    break;
+                }
+            }
+            if (tmp == 1 && allPositive) {
+                t_invariant.add(each);
+            }
+        }
+
+        for (int[] each : t_invariant) {
+            for (int i : each) {
+                System.out.print(i + "\t");
+            }
+            System.out.println();
+        }
+
+        System.out.println("====");
+        Set<int[]> p_invariant = MatrixCalculator.leftCalculate(matrix);
+
+        for (int[] each : generateAvail(traces, t_invariant)) {
+            for (int i : each) {
+                System.out.print(i + "\t");
+            }
+            System.out.println();
+        }
+
+        return basic;
     }
+
+    private Set<int[]> generateAvail(Trace trace, Set<int[]> Tiw) {
+        Set<int[]> avail = new HashSet<>();
+        Collection<String> traces = trace.getTraces().values();
+
+        for (int[] each : Tiw) {
+            String tmp = "";
+            for (int i = 0; i < each.length - 1; i++) {
+                if (each[i] == 1)
+                    tmp += (char) ('A' + i);
+            }
+            for (String eachTrace : traces) {
+                if (isInTrace(eachTrace, tmp)) {
+                    avail.add(each);
+                    break;
+                }
+            }
+        }
+        return avail;
+    }
+
+    private boolean isInTrace(String trace, String tmp) {
+        if (trace.length() != tmp.length()) {
+            return false;
+        } else {
+            for (char each : tmp.toCharArray()) {
+                if (!trace.contains(each + "")) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+//    private void printLogs(Petrinet net) {
+//        Collection<Transition> transitions = net.getTransitions();
+//        Collection<Place> places = net.getPlaces();
+//
+//        Set<Transition> startT = new HashSet<>();
+//        Set<Transition> endT = new HashSet<>();
+//
+//        for (Transition t : transitions) {
+//            if (t.getVisiblePredecessors().isEmpty() || t.getVisiblePredecessors() == null) {
+//                startT.add(t);
+//            } else if (t.getVisibleSuccessors().isEmpty() || t.getVisibleSuccessors() == null) {
+//                endT.add(t);
+//            }
+//        }
+//
+//        for (Transition t : startT) {
+//            Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> outEdges = net.getOutEdges(t);
+//
+//        }
+//
+//    }
+//
+//
+//    private Trace generateWLog(Set<Tuple> Xw, Set<Tuple> start, Set<Tuple> end) {
+//        Map<String, String> gTrace = new HashMap<>();
+//        int keySig = 1;
+//        for (Tuple tuple : start) {
+//            List<String> gLog = findLog(Xw, tuple, end);
+//            if (!gLog.isEmpty()) {
+//                for (String log : gLog) {
+//                    gTrace.put("" + (keySig++), log);
+//                }
+//            }
+//        }
+//        return new Trace(gTrace);
+//    }
+//
+//    private List<String> findLog(Set<Tuple> Xw, Tuple startTuple, Set<Tuple> end) {
+//
+//
+//        return new ArrayList<>();
+//    }
+
 
 }
