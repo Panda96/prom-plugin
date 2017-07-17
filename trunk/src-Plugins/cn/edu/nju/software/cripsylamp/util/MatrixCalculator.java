@@ -278,28 +278,6 @@ public class MatrixCalculator {
         }
         processNotZeroLine(notZeroList, numOfNotZeroLine);
 
-//        int miniNumber = 0, miniPosition = 0;
-//        Set<Integer> minimalAbs = new HashSet<>();
-//
-//        for (int[] each : right) {
-//            miniNumber = 0;
-//            for (int i = 0; i < each.length; i++) {
-//                if (each[i] != 0 && miniNumber == 0) {
-//                    miniNumber = Math.abs(each[i]);
-//                    miniPosition = i;
-//                } else if (each[i] != 0 && miniNumber != 0) {
-//                    if (Math.abs(each[i]) > miniNumber) {
-//                        miniNumber = Math.abs(each[i]);
-//                        miniPosition = i;
-//                    }
-//                }
-//            }
-//            minimalAbs.add(miniPosition);
-//            if (minimalAbs.size() >= freedomVariantNum) {
-//                break;
-//            }
-//        }
-
         for (int i = 0; i < notZeroList.size(); i++) {
             for (int j = 0; j < notZeroList.get(0).length; j++) {
                 System.out.print(notZeroList.get(i)[j] + "\t");
@@ -316,7 +294,6 @@ public class MatrixCalculator {
                     eachResult[j] = 0;
                 }
             }
-//            for (int m = 0;m < numOfNotZeroLine;m++){
             for (int n = 0; n < numOfNotZeroLine; n++) {
                 eachResult[n] = 0;
                 double[] varientLine = notZeroList.get(n);

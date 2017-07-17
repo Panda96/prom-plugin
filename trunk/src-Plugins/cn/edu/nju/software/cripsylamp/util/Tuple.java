@@ -149,8 +149,6 @@ public class Tuple {
         Set<Character> right = new HashSet<>(rightPart);
 
         return new Tuple(left, right);
-//        this.leftPart.addAll(b.leftPart);
-//        b.setUsing(false);
     }
 
     public Tuple rightUnion(Tuple b) {
@@ -163,8 +161,6 @@ public class Tuple {
         Set<Character> left = new HashSet<>(leftPart);
 
         return new Tuple(left, right);
-//        this.rightPart.addAll(b.rightPart);
-//        b.setUsing(false);
     }
 
     public boolean contain(Tuple tuple) {

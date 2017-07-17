@@ -156,26 +156,8 @@ public class MatrixSolver {
         String[] result = new String[n - 1];
         for (int i = 0; i < n - 1; i++) {
             if (!main_factor.contains(i)) {
-//                result[i] = "x_" + (i + 1) + "(free var)";
                 free_var.add((i));
-//            } else {
-//                int row_of_maini = main_factor.indexOf(i);
-//                result[i] = "" + matrix[row_of_maini][n - 1];
-//                for (int j = i + 1; j < n - 1; j++) {
-//                    int ratio = matrix[row_of_maini][j];
-//                    if (ratio > 0) {
-//                        result[i] = result[i] + "-" + ratio + "x_" + (j + 1);
-//                    } else if (ratio < 0) {
-//                        result[i] = result[i] + "+" + (-ratio) + "x_" + (j + 1);
-//                    }
-//                }
-//            }
             }
-//        }
-
-//        for (int i = 0; i < n - 1; i++) {
-//            System.out.println("x_" + (i + 1) + " = " + result[i]);
-//        }
         }
         return free_var;
     }
