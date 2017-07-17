@@ -204,7 +204,7 @@ public class EnhancedAlphaMiner {
         }
 
 //        Main.Rank(MatrixCalculator.matrixSet2Array(minimalPvs));
-        System.out.println(minimalPvs.isEmpty());
+//        System.out.println(minimalPvs.isEmpty());
         for (int[] each : minimalPvs) {
             for (int i : each) {
                 System.out.print(i + "\t");
@@ -296,13 +296,13 @@ public class EnhancedAlphaMiner {
 //        pvse.addAll(pvsa);
 //        pvse.addAll(MatrixCalculator.array2MatrixSet(matrix));
 
-        System.out.println("=================");
-        for (int[] each : pvsa) {
-            for (int i : each) {
-                System.out.print(i + " ");
-            }
-            System.out.println();
-        }
+//        System.out.println("=================");
+//        for (int[] each : pvsa) {
+//            for (int i : each) {
+//                System.out.print(i + " ");
+//            }
+//            System.out.println();
+//        }
 
         view.addLostPlaces(pvsa, basic);
 
