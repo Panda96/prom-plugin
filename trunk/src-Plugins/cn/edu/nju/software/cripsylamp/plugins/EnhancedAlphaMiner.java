@@ -2,6 +2,7 @@ package cn.edu.nju.software.cripsylamp.plugins;
 
 import cn.edu.nju.software.cripsylamp.beans.Trace;
 import cn.edu.nju.software.cripsylamp.util.MatrixCalculator;
+import cn.edu.nju.software.cripsylamp.util.MatrixSolver;
 import cn.edu.nju.software.cripsylamp.util.Tuple;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
@@ -187,53 +188,52 @@ public class EnhancedAlphaMiner {
 //            System.out.println();
 //        }
 
-        Set<int[]> pvs = MatrixCalculator.leftCalculate(
-                MatrixCalculator.T_matrix
-                        (MatrixCalculator.matrixSet2Array(t_avail)));
+        Set<int[]> pvs = MatrixSolver.solve(
+                (MatrixCalculator.matrixSet2Array(t_avail)));
 
-        int avaiSize = t_avail.size();
-        int miniSize = basic.getTransitions().size() + 1 - avaiSize;
-        Set<int[]> minimalPvs = new HashSet<>();
-        for (int[] each : pvs) {
-            if (permitIn(minimalPvs, each)) {
-                minimalPvs.add(each);
-            }
-            if (minimalPvs.size() == miniSize) {
-                break;
-            }
-        }
+//        int avaiSize = t_avail.size();
+//        int miniSize = basic.getTransitions().size() + 1 - avaiSize;
+//        Set<int[]> minimalPvs = new HashSet<>();
+//        for (int[] each : pvs) {
+//            if (permitIn(minimalPvs, each)) {
+//                minimalPvs.add(each);
+//            }
+//            if (minimalPvs.size() == miniSize) {
+//                break;
+//            }
+//        }
 
-//        Main.Rank(MatrixCalculator.matrixSet2Array(minimalPvs));
-        System.out.println(minimalPvs.isEmpty());
-        for (int[] each : minimalPvs) {
-            for (int i : each) {
-                System.out.print(i + "\t");
-            }
-            System.out.println();
-        }
-
-        // 化为上三角
-        for (int[] each : minimalPvs) {
-            Set<int[]> all = new HashSet<>();
-            all.addAll(minimalPvs);
-            all.remove(each);
-            for (int i = 0; i < minimalPvs.size(); i++)
-                for (int[] a : all) {
-                    int[] sum = addTwoArray(each, a);
-                    if (judgeOne(sum)) {
-                        if (numOfZeros(sum) > numOfZeros(each)) {
-                            replaceAll(each, sum);
-                        }
-                    }
-
-                    sum = differenceTwoArray(each, a);
-                    if (judgeOne(sum)) {
-                        if (numOfZeros(sum) > numOfZeros(each)) {
-                            replaceAll(each, sum);
-                        }
-                    }
-                }
-        }
+////        MatrixSolver.Rank(MatrixCalculator.matrixSet2Array(minimalPvs));
+//        System.out.println(minimalPvs.isEmpty());
+//        for (int[] each : minimalPvs) {
+//            for (int i : each) {
+//                System.out.print(i + "\t");
+//            }
+//            System.out.println();
+//        }
+//
+//        // 化为上三角
+//        for (int[] each : minimalPvs) {
+//            Set<int[]> all = new HashSet<>();
+//            all.addAll(minimalPvs);
+//            all.remove(each);
+//            for (int i = 0; i < minimalPvs.size(); i++)
+//                for (int[] a : all) {
+//                    int[] sum = addTwoArray(each, a);
+//                    if (judgeOne(sum)) {
+//                        if (numOfZeros(sum) > numOfZeros(each)) {
+//                            replaceAll(each, sum);
+//                        }
+//                    }
+//
+//                    sum = differenceTwoArray(each, a);
+//                    if (judgeOne(sum)) {
+//                        if (numOfZeros(sum) > numOfZeros(each)) {
+//                            replaceAll(each, sum);
+//                        }
+//                    }
+//                }
+//        }
 
 //        System.out.println("--------------");
 //        System.out.println(minimalPvs.isEmpty());
@@ -281,12 +281,12 @@ public class EnhancedAlphaMiner {
 //            System.out.println();
 //        }
 
-        for (int[] each : minimalPvs) {
+        for (int[] each : pvs) {
             positiveFirst(each);
         }
 
         Set<int[]> pvsa = new HashSet<>();
-        for (int[] each : minimalPvs) {
+        for (int[] each : pvs) {
             if (!MatrixCalculator.checkZero(non_avail, each)) {
                 pvsa.add(each);
             }
