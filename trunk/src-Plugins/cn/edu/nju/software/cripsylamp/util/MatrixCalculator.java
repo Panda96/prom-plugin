@@ -6,10 +6,7 @@ import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by CYF and keenan on 2017/7/16.
@@ -202,24 +199,213 @@ public class MatrixCalculator {
         return true;
     }
 
+    private static double[][] UpTri(double[][] tmp) {
+        double[][] Matrix = new double[tmp[0].length][tmp[0].length];
+        for (int i = 0; i < tmp.length; i++) {
+            for (int j = 0; j < tmp[0].length; j++) {
+                Matrix[i][j] = tmp[i][j];
+            }
+        }
+        for (int i = tmp.length; i < Matrix.length; i++) {
+            for (int j = 0; j < Matrix[0].length; j++) {
+                Matrix[i][j] = 0;
+            }
+        }
+        int Count = 1, n = Matrix[0].length;
+        while (Count < n) {
+            for (int N = n - 1; N >= Count; N--) {
+                double z;
+                if (Matrix[Count - 1][Count - 1] != 0) {
+                    z = Matrix[N][Count - 1] / Matrix[Count - 1][Count - 1];
+                } else {
+                    for (int i = 0; i < n; i++) {
+                        Matrix[Count - 1][i] += Matrix[N][i];
+                    }
+                    z = Matrix[N][Count - 1] / Matrix[Count - 1][Count - 1];
+                }
+                for (int i = 0; i < n; i++) {
+                    Matrix[N][i] = Matrix[N][i] - Matrix[Count - 1][i] * z;
+                }
+            }
+            Count++;
+        }
 
-//    public static void main(String[] args){
+        return Matrix;
+    }
+
+    private static double[][] intArray2Double(int[][] array) {
+        double[][] result = new double[array.length][array[0].length];
+        for (int x = 0; x < array.length; x++) {
+            for (int y = 0; y < array[0].length; y++) {
+                result[x][y] = (double) array[x][y];
+            }
+        }
+        return result;
+    }
+
+    public static Set<int[]> calcAnswerForMatrix(Set<int[]> right) {
+        Set<int[]> result = new HashSet<>();
+
+        // 化为上三角
+        double[][] upMatrix = UpTri(intArray2Double(T_matrix(matrixSet2Array(right))));
+
+//        int numOfNotZeroLine = 0,lineSizelength=0;
+        ArrayList<double[]> notZeroList = new ArrayList<>();
+        for (double[] each : upMatrix) {
+//            lineSizelength = each.length;
+            if (numOfZeros(each) != each.length && (!Double.isNaN(each[0]))) {
+//                numOfNotZeroLine++;
+                notZeroList.add(each.clone());
+            }
+        }
+
+        int numOfNotZeroLine = notZeroList.size();
+        int freedomVariantNum = notZeroList.get(0).length - notZeroList.size();
+
+        for (int i = 0; i < numOfNotZeroLine; i++) {
+            for (int j = i + 1; j < numOfNotZeroLine; j++) {
+                if (getFirstOnePosition(notZeroList.get(i)) > getFirstOnePosition(notZeroList.get(j))) {
+                    changeTwoArray(notZeroList.get(i), notZeroList.get(j));
+                }
+            }
+        }
+
+        for (int i = 0; i < notZeroList.size(); i++) {
+            for (int j = 0; j < notZeroList.get(0).length; j++) {
+                System.out.print(notZeroList.get(i)[j] + "\t");
+            }
+            System.out.println();
+        }
+        processNotZeroLine(notZeroList, numOfNotZeroLine);
+
+//        int miniNumber = 0, miniPosition = 0;
+//        Set<Integer> minimalAbs = new HashSet<>();
+//
+//        for (int[] each : right) {
+//            miniNumber = 0;
+//            for (int i = 0; i < each.length; i++) {
+//                if (each[i] != 0 && miniNumber == 0) {
+//                    miniNumber = Math.abs(each[i]);
+//                    miniPosition = i;
+//                } else if (each[i] != 0 && miniNumber != 0) {
+//                    if (Math.abs(each[i]) > miniNumber) {
+//                        miniNumber = Math.abs(each[i]);
+//                        miniPosition = i;
+//                    }
+//                }
+//            }
+//            minimalAbs.add(miniPosition);
+//            if (minimalAbs.size() >= freedomVariantNum) {
+//                break;
+//            }
+//        }
+
+        for (int i = 0; i < notZeroList.size(); i++) {
+            for (int j = 0; j < notZeroList.get(0).length; j++) {
+                System.out.print(notZeroList.get(i)[j] + "\t");
+            }
+            System.out.println();
+        }
+
+        int[] eachResult = new int[notZeroList.get(0).length];
+        for (int i = numOfNotZeroLine; i < notZeroList.get(0).length; i++) {
+            for (int j = numOfNotZeroLine; j < notZeroList.get(0).length; j++) {
+                if (i == j) {
+                    eachResult[j] = 1;
+                } else {
+                    eachResult[j] = 0;
+                }
+            }
+//            for (int m = 0;m < numOfNotZeroLine;m++){
+            for (int n = 0; n < numOfNotZeroLine; n++) {
+                eachResult[n] = 0;
+                double[] varientLine = notZeroList.get(n);
+                for (int m = numOfNotZeroLine; m < freedomVariantNum; m++) {
+                    eachResult[n] += -1 * eachResult[m] * varientLine[m];
+                }
+            }
+//            }
+            result.add(eachResult.clone());
+        }
+
+        System.out.println("result");
+        for (int[] each:result) {
+            for (int i :each) {
+                System.out.print(i+"\t");
+            }
+            System.out.println();
+        }
+        return null;
+    }
+
+    private static int getFirstOnePosition(double[] a) {
+        for (int i = 0; i < a.length; i++) {
+            if (a[i] != 0) {
+                return i;
+            }
+        }
+        return a.length - 1;
+    }
+
+    private static double numOfZeros(double[] a) {
+        double sum = 0;
+        for (double i : a) {
+            if (i == 0) {
+                sum++;
+            }
+        }
+
+        return sum;
+    }
+
+    private static void changeTwoArray(double[] a, double[] b) {
+        for (int i = 0; i < a.length; i++) {
+            double tmp = a[i];
+            a[i] = b[i];
+            b[i] = tmp;
+        }
+    }
+
+    private static void processNotZeroLine(ArrayList<double[]> tmp, int colNum) {
+        for (int i = tmp.size() - 2; i >= 0; i--) {
+            for (int j = i + 1; j < colNum; j++) {
+                if (tmp.get(i)[j] != 0) {
+                    reduceToZero(tmp.get(i), tmp.get(j), j);
+                }
+            }
+        }
+    }
+
+    private static void reduceToZero(double[] a1, double[] a2, int position) {
+        double tmp = a1[position] / a2[position];
+        for (int i = 0; i < a1.length; i++) {
+            a1[i] -= a2[i] * tmp;
+        }
+    }
+
+    public static void main(String[] args) {
 //        int[][] array={
-//            {-1,0,0,0,0,0,0,0,1},
-//            {1,-1,-1,0,0,0,0,0,0},
-//            {1,0,0,-1,0,0,0,0,0},
-//            {0,1,0,0,-1,0,0,0,0},
-//            {0,0,1,0,0,-1,0,0,0},
-//            {0,0,0,1,0,0,-1,0,0},
-//            {0,0,0,0,1,1,0,-1,0},
-//            {0,0,0,0,0,0,1,-1,0},
-//            {0,0,0,0,0,0,0,1,-1}};
-//        Set<int[]> result = leftCalculate(array);
+//            {-1,0,0,0,0,0,0,0,1,0},
+//            {1,-1,-1,0,0,0,0,0,0,0},
+//            {1,0,0,-1,0,0,0,0,0,0},
+//            {0,1,0,0,-1,0,0,0,0,0},
+//            {0,0,1,0,0,-1,0,0,0,0},
+//            {0,0,0,1,0,0,-1,0,0,0},
+//            {0,0,0,0,1,1,0,-1,0,0},
+//            {0,0,0,0,0,0,1,-1,0,0},
+//            {0,0,0,0,0,0,0,1,-1,0}};
+        int[][] array = {
+                {1, 0, 0, 0, 1, 1, 0, 0, 1, 0},
+                {0, 1, 0, 1, 1, 0, 1, 0, 1, 0},
+                {0, 0, 1, 0, 1, 0, 0, 1, 1, 0}
+        };
+
+        Set<int[]> result = calcAnswerForMatrix(array2MatrixSet(T_matrix(array)));
 //        for (int[] each:result) {
 //            for (int i:each) {
 //                System.out.print(i+"\t");
 //            }
 //            System.out.println();
 //        }
-//    }
+    }
 }
