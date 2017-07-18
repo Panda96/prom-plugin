@@ -1,5 +1,6 @@
 package cn.edu.nju.software.cripsylamp.beans;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,5 +48,17 @@ public class Trace {
             }
         }
         return false;
+    }
+
+    public Trace removeT(Set<Character> t){
+        Map<String,String> resultTraces = new HashMap<>();
+        for(String key:this.traces.keySet()){
+            String value = this.traces.get(key);
+            for (char each:t) {
+                value = value.replace(each+"","");
+            }
+            resultTraces.put(key,value);
+        }
+        return new Trace(resultTraces);
     }
 }
