@@ -148,6 +148,7 @@ public class MatrixCalculator {
 
     public static int[][] matrixSet2Array(Set<int[]> set) {
         if (set.isEmpty()) {
+            System.out.println("MatrixCalculator.matrixSet2Array - set is empty");
             return null;
         }
         Iterator<int[]> iterator = set.iterator();

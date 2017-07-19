@@ -16,9 +16,8 @@ import java.util.Set;
 /**
  * Created by keenan on 15/07/2017.
  */
+@SuppressWarnings("Duplicates")
 public class EnhancedAlphaMiner {
-
-
     @Plugin(
             name = "Enhanced Alpha Miner Plugin",
             parameterLabels = {"Traces"},
@@ -33,9 +32,13 @@ public class EnhancedAlphaMiner {
             email = "151250206@smail.nju.edu.cn"
     )
 
+    @SuppressWarnings("Duplicates")
     public Petrinet enhancedAlphaMiner(UIPluginContext context, Trace traces) {
-        Petrinet basic = SimpleAlphaMinerHelper.getPetrinetMinedByAlpha(traces);
+        return findLostPlaces(traces);
+    }
 
+    public static Petrinet findLostPlaces(Trace traces) {
+        Petrinet basic = SimpleAlphaMinerHelper.getPetrinetMinedByAlpha(traces);
 
         Set<Character> start = new HashSet<>();
 
@@ -74,8 +77,13 @@ public class EnhancedAlphaMiner {
         Set<int[]> t_avail = generateAvail(traces, t_invariant);
         t_invariant.removeAll(t_avail);
 
-        Set<int[]> pvs = MatrixSolver.solve(
-                (MatrixCalculator.matrixSet2Array(t_avail)));
+        Set<int[]> pvs;
+        if (t_avail.isEmpty()) {
+            pvs = new HashSet<>();
+        } else {
+            pvs = MatrixSolver.solve(
+                    (MatrixCalculator.matrixSet2Array(t_avail)));
+        }
 
         int[][] non_avail = MatrixCalculator.matrixSet2Array(t_invariant);
         if (non_avail == null) {
@@ -99,7 +107,7 @@ public class EnhancedAlphaMiner {
         return basic;
     }
 
-    private Set<int[]> generateAvail(Trace trace, Set<int[]> Tiw) {
+    private static Set<int[]> generateAvail(Trace trace, Set<int[]> Tiw) {
         Set<int[]> avail = new HashSet<>();
         Collection<String> traces = trace.getTraces().values();
 
@@ -120,7 +128,7 @@ public class EnhancedAlphaMiner {
         return avail;
     }
 
-    private boolean isInTrace(String trace, String tmp) {
+    private static boolean isInTrace(String trace, String tmp) {
         if (trace.length() != tmp.length()) {
             return false;
         } else {
@@ -134,7 +142,7 @@ public class EnhancedAlphaMiner {
         return true;
     }
 
-    private void positiveFirst(int[] a) {
+    private static void positiveFirst(int[] a) {
         boolean posiFirst = true;
         for (int i = 0; i < a.length; i++) {
             if (a[i] == -1) {

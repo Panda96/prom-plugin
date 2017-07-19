@@ -1,24 +1,18 @@
 package cn.edu.nju.software.cripsylamp.plugins;
 
-import cn.edu.nju.software.cripsylamp.algorithmhelper.SimpleAlphaMinerHelper;
 import cn.edu.nju.software.cripsylamp.beans.Trace;
 import cn.edu.nju.software.cripsylamp.util.ThreeTransitionTuple;
-import cn.edu.nju.software.cripsylamp.util.Tuple;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
-import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
-import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
-import org.processmining.models.graphbased.directed.petrinet.elements.Place;
-import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by CYF on 2017/7/18.
  */
-
 public class AlphaPlusMiner {
     @Plugin(
             name = "Alpha Plus Miner Plugin",
@@ -54,7 +48,7 @@ public class AlphaPlusMiner {
 
         Set<ThreeTransitionTuple> transitionLoop1Set = new HashSet<>();
         for (char each : L1L) {
-            char left = ' ',right = ' ';
+            char left = ' ', right = ' ';
             boolean hasMet = false;
             for (String str : traces.getTraces().values()) {
                 for (int i = 0; i < str.length(); i++) {
@@ -63,7 +57,7 @@ public class AlphaPlusMiner {
                         left = thisChar;
                     } else if (thisChar != each && hasMet) {
                         right = thisChar;
-                        transitionLoop1Set.add(new ThreeTransitionTuple(left,each,right));
+                        transitionLoop1Set.add(new ThreeTransitionTuple(left, each, right));
                         break;
                     } else if (thisChar == each) {
                         hasMet = true;
@@ -74,9 +68,11 @@ public class AlphaPlusMiner {
 
         Trace traceWithoutL1L = traces.removeT(L1L);
 
-        Petrinet alphaResult = SimpleAlphaMinerHelper.getPetrinetMinedByAlpha(traceWithoutL1L);
+//        Petrinet alphaResult = SimpleAlphaMinerHelper.getPetrinetMinedByAlpha(traceWithoutL1L);
+        Petrinet alphaResult = EnhancedAlphaMiner.findLostPlaces(traceWithoutL1L);
         AlphaPlusMinerView view = new AlphaPlusMinerView();
-        view.addLostTransitions(alphaResult,transitionLoop1Set);
+        view.addLostTransitions(alphaResult, transitionLoop1Set);
         return alphaResult;
     }
+
 }
