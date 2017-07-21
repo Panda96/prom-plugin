@@ -307,9 +307,9 @@ public class MatrixCalculator {
         }
 
         System.out.println("result");
-        for (int[] each:result) {
-            for (int i :each) {
-                System.out.print(i+"\t");
+        for (int[] each : result) {
+            for (int i : each) {
+                System.out.print(i + "\t");
             }
             System.out.println();
         }
@@ -372,13 +372,25 @@ public class MatrixCalculator {
 //            {0,0,0,0,1,1,0,-1,0,0},
 //            {0,0,0,0,0,0,1,-1,0,0},
 //            {0,0,0,0,0,0,0,1,-1,0}};
+//        int[][] array = {
+//                {1, 0, 0, 0, 1, 1, 0, 0, 1, 0},
+//                {0, 1, 0, 1, 1, 0, 1, 0, 1, 0},
+//                {0, 0, 1, 0, 1, 0, 0, 1, 1, 0}
+//        };
         int[][] array = {
-                {1, 0, 0, 0, 1, 1, 0, 0, 1, 0},
-                {0, 1, 0, 1, 1, 0, 1, 0, 1, 0},
-                {0, 0, 1, 0, 1, 0, 0, 1, 1, 0}
+                {-1, 0, 0, 0, 0, 0, 0, 0, 1},
+                {1, -1, -1, 0, 0, 0, 0, 0, 0},
+                {1, 0, 0, -1, 0, 0, 0, 0, 0},
+                {0, 1, 0, 0, -1, 0, 0, 0, 0},
+                {0, 0, 1, 0, 0, -1, 0, 0, 0},
+                {0, 0, 0, 1, 0, 0, -1, 0, 0},
+                {0, 0, 0, 0, 1, 1, 0, -1, 0},
+                {0, 0, 0, 0, 0, 0, 1, -1, 0},
+                {0, 0, 0, 0, 0, 0, 0, 1, -1}
         };
 
-        Set<int[]> result = calcAnswerForMatrix(array2MatrixSet(T_matrix(array)));
+//        Set<int[]> result = calcAnswerForMatrix(array2MatrixSet(T_matrix(array)));
+//        Set<int[]> result = leftCalculate();
 //        for (int[] each:result) {
 //            for (int i:each) {
 //                System.out.print(i+"\t");
@@ -386,4 +398,6 @@ public class MatrixCalculator {
 //            System.out.println();
 //        }
     }
+
+
 }

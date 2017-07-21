@@ -2,6 +2,7 @@ package cn.edu.nju.software.cripsylamp.plugins;
 
 import cn.edu.nju.software.cripsylamp.util.Tuple;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
+import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetFactory;
@@ -70,19 +71,53 @@ public class EnhancedAlphaMinerView {
         int placeCnt = placeCollection.size();
         Map<String, Transition> tansitionMap = new HashMap<>();
 
+        char reach_char = 'A';
         for (Transition transition : all) {
-            tansitionMap.put(transition.getLabel(), transition);
+            if(transition.getLabel().charAt(0)!='i') {
+                tansitionMap.put(transition.getLabel().charAt(0) + "", transition);
+                reach_char = transition.getLabel().charAt(0);
+                System.out.println("reach_char = " + reach_char);
+            }
+        }
+        for (Transition transition : all) {
+            if(transition.getLabel().charAt(0)=='i') {
+                tansitionMap.put((char)(++reach_char)+"", transition);
+//                System.out.println("reach_char+(1) = " + (++reach_char));
+//                reach_char++;
+            }
         }
 
+        for (String key:tansitionMap.keySet()){
+            System.out.print(key);
+        }
+        System.out.println();
         for (int[] each : PVSa) {
             Place place = ori.addPlace("p" + placeCnt++);
+            boolean leftAdd = false;
+            boolean rightAdd = false;
             for (int i = 0; i < each.length - 1; i++) {
                 char label = (char) ('A' + i);
                 if (each[i] == 1) {
+                    System.out.println("label+\"\" = " + label+"");
                     ori.addArc(tansitionMap.get(label + ""), place);
+                    leftAdd = true;
                 } else if (each[i] == -1) {
                     ori.addArc(place, tansitionMap.get(label + ""));
+                    rightAdd = true;
                 }
+            }
+            if (!(leftAdd&&rightAdd)){
+                for (PetrinetEdge e:ori.getInEdges(place)) {
+                    System.out.println(e.getLabel());
+                    ori.removeEdge(e);
+                }
+                for (PetrinetEdge e:ori.getOutEdges(place)) {
+                    System.out.println(e.getLabel());
+                    ori.removeEdge(e);
+                }
+                System.out.println("place.getLabel() = " + place.getLabel());
+                ori.removePlace(place);
+                placeCnt--;
             }
         }
     }

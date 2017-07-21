@@ -62,7 +62,7 @@ public class ModifiedAlphaPlusPlusMiner {
             String trace = "";
             for (XEvent xEvent : xEvents) {
                 String name = xEvent.getAttributes().get("concept:name").toString();
-                trace += name + " ";
+                trace += name ;
             }
             map.put(i++ + "", trace.trim());
         }
@@ -72,8 +72,9 @@ public class ModifiedAlphaPlusPlusMiner {
         }
 
         Trace trace = new Trace(map);
+        petrinet = EnhancedAlphaMiner.findLostPlaces(petrinet,trace);
 
-        return new Object[]{markedNet.getFirst(), markedNet.getSecond()};
+        return new Object[]{petrinet, markedNet.getSecond()};
     }
 
     public static Object[] apply(PluginContext context, XLog log, XEventClassifier classifier, AlphaVersion version) {
