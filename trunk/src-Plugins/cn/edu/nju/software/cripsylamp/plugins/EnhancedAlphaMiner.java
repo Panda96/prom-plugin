@@ -34,12 +34,12 @@ public class EnhancedAlphaMiner {
 
     @SuppressWarnings("Duplicates")
     public Petrinet enhancedAlphaMiner(UIPluginContext context, Trace traces) {
-        return findLostPlaces(traces);
-    }
-
-    public static Petrinet findLostPlaces(Trace traces) {
         Petrinet basic = SimpleAlphaMinerHelper.getPetrinetMinedByAlpha(traces);
 
+        return findLostPlaces(basic, traces);
+    }
+
+    public static Petrinet findLostPlaces(Petrinet basic, Trace traces) {
         Set<Character> start = new HashSet<>();
 
         for (String trace : traces.getTraces().values()) {

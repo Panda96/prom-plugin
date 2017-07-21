@@ -69,10 +69,11 @@ public class AlphaPlusMiner {
         Trace traceWithoutL1L = traces.removeT(L1L);
 
 //        Petrinet alphaResult = SimpleAlphaMinerHelper.getPetrinetMinedByAlpha(traceWithoutL1L);
-        Petrinet alphaResult = EnhancedAlphaMiner.findLostPlaces(traceWithoutL1L);
-        AlphaPlusMinerView view = new AlphaPlusMinerView();
-        view.addLostTransitions(alphaResult, transitionLoop1Set);
-        return alphaResult;
+//        Petrinet alphaResult = EnhancedAlphaMiner.findLostPlaces(traceWithoutL1L);
+//        AlphaPlusMinerView view = new AlphaPlusMinerView();
+//        view.addLostTransitions(alphaResult, transitionLoop1Set);
+//        return alphaResult;
+        return null;
     }
 
 }
