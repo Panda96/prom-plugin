@@ -1,9 +1,11 @@
 package cn.edu.nju.software.cripsylamp.plugins;
 
+import cn.edu.nju.software.cripsylamp.beans.Trace;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClassifier;
-import org.deckfour.xes.model.XAttribute;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
 import org.processmining.alphaminer.abstractions.AlphaClassicAbstraction;
 import org.processmining.alphaminer.algorithms.AlphaMiner;
 import org.processmining.alphaminer.algorithms.AlphaMinerFactory;
@@ -26,13 +28,15 @@ import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.semantics.petrinet.Marking;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@Plugin(name = "Modified Alpha Plus Plus Miner", level = PluginLevel.PeerReviewed, parameterLabels = {"Log", "Classifier",
+        "Parameters"}, returnLabels = {"Petrinet", "Marking"}, returnTypes = {Petrinet.class,
+        Marking.class}, help = AlphaMinerHelp.TEXT, quality = PluginQuality.VeryGood, categories = {
+        PluginCategory.Discovery})
 public class ModifiedAlphaPlusPlusMiner {
-    @Plugin(name = "Modified Alpha Plus Plus Miner", level = PluginLevel.PeerReviewed, parameterLabels = {"Log", "Classifier",
-            "Parameters"}, returnLabels = {"Petrinet", "Marking"}, returnTypes = {Petrinet.class,
-            Marking.class}, help = AlphaMinerHelp.TEXT, quality = PluginQuality.VeryGood, categories = {
-            PluginCategory.Discovery})
     @PluginVariant(requiredParameterLabels = {0, 1, 2})
     public static Object[] apply(PluginContext context, XLog log, XEventClassifier classifier,
                                  AlphaMinerParameters parameters) {
@@ -52,10 +56,22 @@ public class ModifiedAlphaPlusPlusMiner {
         /**
          * check verification
          */
-        for (XAttribute attribute : log.getGlobalEventAttributes()) {
-            System.out.println(attribute.getKey());
+        Map<String, String> map = new HashMap<>();
+        int i = 0;
+        for (XTrace xEvents : log) {
+            String trace = "";
+            for (XEvent xEvent : xEvents) {
+                String name = xEvent.getAttributes().get("concept:name").toString();
+                trace += name + " ";
+            }
+            map.put(i++ + "", trace.trim());
         }
 
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            System.out.println(entry.getValue());
+        }
+
+        Trace trace = new Trace(map);
 
         return new Object[]{markedNet.getFirst(), markedNet.getSecond()};
     }
