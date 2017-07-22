@@ -1,5 +1,7 @@
 package cn.edu.nju.software.cripsylamp.beta;
 
+import cn.edu.nju.software.cripsylamp.beans.Trace;
+import cn.edu.nju.software.cripsylamp.plugins.EnhancedAlphaMiner;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
@@ -12,6 +14,8 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Transition
 import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("Duplicates")
 public class BetaMiner {
@@ -38,6 +42,20 @@ public class BetaMiner {
     )
     public Petrinet mine(UIPluginContext context, XLog log) {
         Petrinet result = mineIt(log);
+
+        Map<String, String> map = new HashMap<>();
+        int i = 0;
+        for (XTrace xEvents : log) {
+            String trace = "";
+            for (XEvent xEvent : xEvents) {
+                String name = xEvent.getAttributes().get("concept:name").toString();
+                trace += name;
+            }
+            map.put(i++ + "", trace.trim());
+        }
+
+        Trace trace = new Trace(map);
+        result = EnhancedAlphaMiner.findLostPlaces(result, trace);
         return result;
     }
 
