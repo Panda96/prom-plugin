@@ -92,6 +92,11 @@ public class EnhancedAlphaMinerView {
         }
         System.out.println();
         for (int[] each : PVSa) {
+            System.out.println("Pvsa:");
+            for (int i = 0; i < each.length; i++) {
+                System.out.print(each[i]+"\t");
+            }
+            System.out.println("-----------");
             Place place = ori.addPlace("p" + placeCnt++);
             boolean leftAdd = false;
             boolean rightAdd = false;

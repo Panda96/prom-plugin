@@ -1,6 +1,9 @@
 package cn.edu.nju.software.cripsylamp.beans;
 
+import cn.edu.nju.software.cripsylamp.util.EachTrace;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,6 +12,16 @@ import java.util.Set;
  */
 public class Trace {
     Map<String, String> traces;
+
+    int visiblenum;
+
+    public void setVisiblenum(int visiblenum) {
+        this.visiblenum = visiblenum;
+    }
+
+    public int getVisiblenum() {
+        return visiblenum;
+    }
 
     public Map<String, String> getTraces() {
         return traces;
@@ -23,6 +36,21 @@ public class Trace {
         this.traces = traces;
     }
 
+//    public Trace(List<String> traceList,int num){
+//        traces = new HashMap<>();
+//        for (int j = 0; j < traceList.size(); j++) {
+//            traces.put("case"+j,traceList.get(j));
+//        }
+//        this.visiblenum = num;
+//    }
+
+    public Trace(List<EachTrace> traceList, int num){
+        traces = new HashMap<>();
+        for (int j = 0; j < traceList.size(); j++) {
+            traces.put("case"+j,traceList.get(j).getTraceString());
+        }
+        this.visiblenum = num;
+    }
     public boolean belongs2SameTrace(Set<Character> a, Set<Character> b) {
         if (a.containsAll(b) && b.containsAll(a)) {
             return true;

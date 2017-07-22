@@ -1,6 +1,7 @@
 package cn.edu.nju.software.cripsylamp.plugins;
 
 import cn.edu.nju.software.cripsylamp.beans.Trace;
+import cn.edu.nju.software.cripsylamp.util.LogGenerator;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XEvent;
@@ -15,10 +16,14 @@ import org.processmining.alphaminer.parameters.AlphaRobustMinerParameters;
 import org.processmining.alphaminer.parameters.AlphaVersion;
 import org.processmining.alphaminer.plugins.ui.AlphaMinerWizardStep;
 import org.processmining.alphaminer.plugins.ui.AlphaRobustMinerWizardStep;
+import org.processmining.contexts.uitopia.UIContext;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
-import org.processmining.framework.plugin.PluginContext;
+import org.processmining.contexts.uitopia.hub.ProMViewManager;
+import org.processmining.framework.plugin.*;
 import org.processmining.framework.plugin.annotations.*;
+import org.processmining.framework.plugin.impl.PluginDescriptorImpl;
+import org.processmining.framework.plugin.impl.PluginExecutionResultImpl;
 import org.processmining.framework.util.Pair;
 import org.processmining.framework.util.ui.wizard.ListWizard;
 import org.processmining.framework.util.ui.wizard.ProMWizardDisplay;
@@ -26,6 +31,9 @@ import org.processmining.framework.util.ui.wizard.ProMWizardStep;
 import org.processmining.models.connections.petrinets.behavioral.InitialMarkingConnection;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.semantics.petrinet.Marking;
+import org.processmining.plugins.cpnet.ColouredPetriNet;
+import org.processmining.plugins.cpnet.SimulateCPNModel;
+//import org.processmining.plugins.stochasticpetrinet.simulator.PNSimulatorPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +59,16 @@ public class ModifiedAlphaPlusPlusMiner {
                 .addConnection(new InitialMarkingConnection(markedNet.getFirst(), markedNet.getSecond()));
 
 
+
         Petrinet petrinet = markedNet.getFirst();
+
+//        UIContext con = new UIContext();
+//        con.initialize();
+//        UIPluginContext uiCon = con.getMainPluginContext();
+//        PluginExecutionResult res = context.getResult();
+//        uiCon.setFuture(res);
+//        XLog xl = PNSimulatorPlugin.options(uiCon,petrinet);
+//        System.out.println(5);
 
         /**
          * check verification
@@ -67,12 +84,15 @@ public class ModifiedAlphaPlusPlusMiner {
             map.put(i++ + "", trace.trim());
         }
 
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            System.out.println(entry.getValue());
-        }
+//        for (Map.Entry<String, String> entry : map.entrySet()) {
+//            System.out.println(entry.getValue());
+//        }
 
-        Trace trace = new Trace(map);
-        petrinet = EnhancedAlphaMiner.findLostPlaces(petrinet,trace);
+        Trace trace = new Trace(map);//initial trace
+
+        Pair<Trace,Petrinet> pair = LogGenerator.SimpleTraceGenerator(trace,petrinet);//new trace and named petrinet
+
+//        petrinet = EnhancedAlphaMiner.findLostPlaces(pair.getSecond(),pair.getFirst());
 
         return new Object[]{petrinet, markedNet.getSecond()};
     }
