@@ -1,7 +1,6 @@
 package cn.edu.nju.software.cripsylamp.beta;
 
 import cn.edu.nju.software.cripsylamp.beans.Trace;
-import cn.edu.nju.software.cripsylamp.plugins.EnhancedAlphaMiner;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
@@ -15,6 +14,7 @@ import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetFactor
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("Duplicates")
@@ -42,22 +42,9 @@ public class BetaMiner {
     )
     public Petrinet mine(UIPluginContext context, XLog log) {
         Petrinet result = mineIt(log);
-
-        Map<String, String> map = new HashMap<>();
-        int i = 0;
-        for (XTrace xEvents : log) {
-            String trace = "";
-            for (XEvent xEvent : xEvents) {
-                String name = xEvent.getAttributes().get("concept:name").toString();
-                trace += name;
-            }
-            map.put(i++ + "", trace.trim());
-        }
-
-        Trace trace = new Trace(map);
-        result = EnhancedAlphaMiner.findLostPlaces(result, trace);
         return result;
     }
+
 
     private Petrinet mineIt(XLog log) {
         this.counting(log);
@@ -120,7 +107,6 @@ public class BetaMiner {
         return petrinet;
     }
 
-
     private void counting(XLog log) {
         this.SuccessiveSequences.clear();
         this.IntersectionalSequences.clear();
@@ -133,9 +119,7 @@ public class BetaMiner {
         ArrayList tasks_completed = new ArrayList();
         ArrayList tasks_ps = new ArrayList();
 
-//        int np = log.numberOfInstances();
         int np = log.size();
-
 
         for (int i = 0; i < np; ++i) {
             XTrace pi = log.get(i);
@@ -357,6 +341,64 @@ public class BetaMiner {
             }
         }
 
+    }
+
+    private Trace transXLog2Trace(XLog log) {
+        Map<String, String> map = new HashMap<>();
+//        lifecycle:transition
+        int i = 0;
+        for (XTrace xEvents : log) {
+            List<String> running = new ArrayList<>();
+            List<String> tmp;
+            String trace = "";
+            for (XEvent xEvent : xEvents) {
+                String name = xEvent.getAttributes().get("concept:name").toString();
+                String state = xEvent.getAttributes().get("lifecycle:transition").toString();
+                if (state.equals("start")) {
+                    running.add(name);
+                    if (running.size() > 1) {
+                        tmp = new ArrayList<>(running);
+                    }
+                } else if (state.equals("complete")) {
+                    running.remove(name);
+                }
+
+                trace += name;
+            }
+            map.put(i++ + "", trace.trim());
+        }
+
+        return null;
+    }
+
+    public List<String> mixBeforeSequence(List<String> beforeSequence) {
+        String last = "";
+        int[] positions = new int[beforeSequence.size()];
+        for (int i = 0; i < beforeSequence.size(); i++) {
+            positions[i] = 0;
+        }
+        List<String> mixList = mix(beforeSequence, positions, last);
+        return mixList;
+    }
+
+    public List<String> mix(List<String> beforeSequence, int[] positions, String last) {
+        List<String> list = new ArrayList<>();
+        String next;
+        boolean notAllEmpy = false;
+        for (int i = 0; i < beforeSequence.size(); i++) {
+            int[] nextPosition = positions.clone();
+            if (nextPosition[i] < beforeSequence.get(i).length()) {
+                notAllEmpy = true;
+                next = last + (beforeSequence.get(i).charAt(nextPosition[i]++) + "");
+                list.addAll(mix(beforeSequence, nextPosition, next));
+            } else {
+                continue;
+            }
+        }
+        if (!notAllEmpy) {
+            list.add(last);
+        }
+        return list;
     }
 
 }
