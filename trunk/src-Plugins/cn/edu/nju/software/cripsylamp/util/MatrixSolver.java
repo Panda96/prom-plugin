@@ -143,6 +143,13 @@ public class MatrixSolver {
 
 
     public static Set<int[]> solve(int[][] a) {
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a[0].length; j++) {
+                System.out.print(a[i][j]+"\t");
+            }
+            System.out.println();
+        }
+        System.out.println();
         int[] b = new int[a.length];
         for (int i = 0; i < a.length; i++) {
             b[i] = 0;
@@ -150,62 +157,88 @@ public class MatrixSolver {
         int[][] matrix = augmented_mat(a, b);
         List<Integer> main_factor = trape_mat(matrix);
         back_solve(matrix, main_factor);
-        List<Integer> free_var = print_result(matrix, main_factor);
-
-        for (int i = 0; i < free_var.size(); i++) {
-            System.out.println((free_var.get(i) + "____"));
+        System.out.println("Matrix");
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                System.out.print(matrix[i][j]);
+            }
+            System.out.println();
         }
+        System.out.println("===");
+        List<Integer> free_var = print_result(matrix, main_factor);
 
         Set<int[]> result = new HashSet<>();
         int[] eachResult;
+        for (int i = 0; i < free_var.size(); i++) {
+            System.out.print(free_var.get(i) + "\t");
+        }
+        System.out.println();
+        for (int i = 0; i < main_factor.size(); i++) {
+            System.out.print(main_factor.get(i) + "\t");
+        }
+        System.out.println();
         for (int i : free_var) {
             eachResult = new int[matrix[0].length];
             for (int j : free_var) {
                 if (j == i) {
-                    eachResult[j] = 1;
+                    eachResult[j] = -1;
                 } else {
                     eachResult[j] = 0;
                 }
             }
 
-            for (int k = 0; k < matrix[0].length; k++) {
-                int rNum = allZeroExcept(k, matrix);
-                if (rNum == -1) {
-                    continue;
-                } else {
-                    System.out.println(rNum);
-                    for (int c = 0; c < matrix[0].length; c++) {
-                        if (c == k) {
-                            continue;
-                        }
-                        eachResult[k] -= eachResult[c] * matrix[rNum][c];
-                    }
+            for (int j : main_factor) {
+//                if (j == i)
+//                    continue;
+                eachResult[j] = 0;
+                int row = allZeroExcept(j, matrix);
+                for (int each : free_var) {
+                    eachResult[j] -= eachResult[each] * matrix[row][each];
                 }
+//                System.out.print(j+""+eachResult[j]+"\n");
             }
             result.add(eachResult.clone());
+//            for (int k = 0; k < matrix[0].length; k++) {
+//                int rNum = allZeroExcept(k, matrix);
+//                if (rNum == -1) {
+//                    continue;
+//                } else {
+//                    System.out.println(rNum);
+//                    for (int c = 0; c < matrix[0].length; c++) {
+//                        if (c == k) {
+//                            continue;
+//                        }
+//                        eachResult[k] -= eachResult[c] * matrix[rNum][c];
+//                    }
+//                }
+//            }
+//            result.add(eachResult.clone());
+            for (int j = 0; j < eachResult.length; j++) {
+                System.out.print(eachResult[j] + "\t");
+            }
+            System.out.println();
         }
 
-        return result;
+        return (result);
     }
 
     private static int allZeroExcept(int cNum, int[][] matrix) {
-        int cnt = 0;
+//        int cnt = 0;
+//        for (int j = 0; j < matrix.length; j++) {
+//            if (matrix[j][cNum] != 0) {
+//                cnt++;
+//            }
+//        }
+//
+//        if (cnt != 1) {
+//            return -1;
+//        } else {
         for (int j = 0; j < matrix.length; j++) {
             if (matrix[j][cNum] != 0) {
-                cnt++;
+                return j;
             }
         }
-
-        if (cnt != 1) {
-            return -1;
-        } else {
-            for (int j = 0; j < matrix.length; j++) {
-                if (matrix[j][cNum] != 0) {
-                    return j;
-                }
-            }
-        }
-
+//        }
         return -1;
     }
 
@@ -221,6 +254,13 @@ public class MatrixSolver {
                 {0, 0, 0, 0, 0, 0, -1, -1, 1},
                 {1, 0, 0, 0, 0, 0, 0, 0, -1}
         };
+        a = MatrixCalculator.T_matrix(a);
+
+//        int[][] a = {
+//                {1, 0, 0, 0, 1, 1, 0, 0, 1},
+//                {0, 1, 0, 1, 1, 0, 1, 0, 1},
+//                {0, 0, 1, 0, 1, 0, 0, 1, 1}
+//        };
 
         MatrixSolver matrixSolver = new MatrixSolver();
         matrixSolver.solve(a);
@@ -228,3 +268,9 @@ public class MatrixSolver {
 
 
 }
+//0	1	0	-1	0	0	0	0	0	0
+//1	1	1	0	-1	0	0	0	0	0
+//1	0	0	0	0	-1	0	0	0	0
+//0	1	0	0	0	0	-1	0	0	0
+//0	0	1	0	0	0	0	-1	0	0
+//1	1	1	0	0	0	0	0	-1	0

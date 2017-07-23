@@ -92,7 +92,7 @@ public class ModifiedAlphaPlusPlusMiner {
 
         Pair<Trace,Petrinet> pair = LogGenerator.SimpleTraceGenerator(trace,petrinet);//new trace and named petrinet
 
-//        petrinet = EnhancedAlphaMiner.findLostPlaces(pair.getSecond(),pair.getFirst());
+        petrinet = EnhancedAlphaMiner.findLostPlaces(pair.getSecond(),pair.getFirst());
 
         return new Object[]{petrinet, markedNet.getSecond()};
     }

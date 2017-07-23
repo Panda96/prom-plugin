@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="CPNet">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/CPNet.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/CPNet.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/CPNet.jar!/" />
+    </SOURCES>
+  </library>
+</component>

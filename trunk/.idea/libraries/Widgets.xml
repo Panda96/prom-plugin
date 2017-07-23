@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Widgets">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/Widgets.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/Widgets.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/Widgets.jar!/" />
+    </SOURCES>
+  </library>
+</component>
