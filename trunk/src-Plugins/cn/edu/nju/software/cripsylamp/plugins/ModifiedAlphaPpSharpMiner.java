@@ -44,7 +44,7 @@ import java.util.Map;
         "Parameters"}, returnLabels = {"Petrinet", "Marking"}, returnTypes = {Petrinet.class,
         Marking.class}, help = AlphaMinerHelp.TEXT, quality = PluginQuality.VeryGood, categories = {
         PluginCategory.Discovery})
-public class ModifiedAlphaPlusPlusMiner {
+public class ModifiedAlphaPpSharpMiner {
     @PluginVariant(requiredParameterLabels = {0, 1, 2})
     public static Object[] apply(PluginContext context, XLog log, XEventClassifier classifier,
                                  AlphaMinerParameters parameters) {
