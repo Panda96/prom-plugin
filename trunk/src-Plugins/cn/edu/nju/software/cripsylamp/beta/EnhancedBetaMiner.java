@@ -1,7 +1,7 @@
 package cn.edu.nju.software.cripsylamp.beta;
 
 import cn.edu.nju.software.cripsylamp.beans.Trace;
-import cn.edu.nju.software.cripsylamp.plugins.EnhancedAlphaMiner;
+import cn.edu.nju.software.cripsylamp.plugins.InvarientMiner;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
@@ -43,7 +43,7 @@ public class EnhancedBetaMiner {
 
         Trace trace = new Trace(map);//initial trace
 
-        petrinet = EnhancedAlphaMiner.findLostPlaces(petrinet, trace);
+        petrinet = InvarientMiner.findLostPlaces(petrinet, trace);
         return petrinet;
     }
 }

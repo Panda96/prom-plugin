@@ -76,7 +76,6 @@ public class MatrixSolver {
 
                 Collections.sort(not_zeros);
 
-
                 if (not_zeros.size() == 0) {
                     main_col += 1;
                     break;
@@ -145,7 +144,7 @@ public class MatrixSolver {
     public static Set<int[]> solve(int[][] a) {
         for (int i = 0; i < a.length; i++) {
             for (int j = 0; j < a[0].length; j++) {
-                System.out.print(a[i][j]+"\t");
+                System.out.print(a[i][j] + "\t");
             }
             System.out.println();
         }
@@ -219,7 +218,51 @@ public class MatrixSolver {
             System.out.println();
         }
 
-        return (result);
+
+//        return (result);
+        return adjustResult(result);
+    }
+
+    private static Set<int[]> adjustResult(Set<int[]> preResult) {
+        Set<int[]> result = new HashSet<>();
+        preResult.forEach(e -> {
+            if (onePositiveOneNegative(e)) {
+                result.add(e);
+            } else {
+                int[] tmp1 = e.clone();
+                int[] tmp2 = e.clone();
+                int preLength = result.size();
+                preResult.forEach(a -> {
+                    for (int i = 0; i < a.length; i++) {
+                        tmp1[i] += a[i];
+                        tmp2[i] -= a[i];
+                    }
+                    if (onePositiveOneNegative(tmp1)) {
+                        result.add(tmp1);
+                        return;
+                    } else if (onePositiveOneNegative(tmp2)) {
+                        result.add(tmp2);
+                        return;
+                    }
+                });
+                if (preLength == result.size()) {
+                    result.add(e);
+                }
+            }
+        });
+        return result;
+    }
+
+    private static boolean onePositiveOneNegative(int[] numbers) {
+        int positive = 0, negative = 0;
+        for (int i = 0; i < numbers.length; i++) {
+            if (numbers[i] > 0) {
+                positive++;
+            } else if (numbers[i] < 0) {
+                negative++;
+            }
+        }
+        return (positive == 1) && (negative == 1);
     }
 
     private static int allZeroExcept(int cNum, int[][] matrix) {
@@ -243,24 +286,24 @@ public class MatrixSolver {
     }
 
     public static void main(String[] args) {
-        int[][] a = {
-                {-1, 1, 1, 0, 0, 0, 0, 0, 0},
-                {0, -1, 0, 1, 0, 0, 0, 0, 0},
-                {0, -1, 0, 0, 1, 0, 0, 0, 0},
-                {0, 0, -1, 0, 0, 1, 0, 0, 0},
-                {0, 0, 0, -1, 0, 0, 1, 0, 0},
-                {0, 0, 0, 0, -1, 0, 1, 0, 0},
-                {0, 0, 0, 0, 0, -1, 0, 1, 0},
-                {0, 0, 0, 0, 0, 0, -1, -1, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, -1}
-        };
-        a = MatrixCalculator.T_matrix(a);
-
 //        int[][] a = {
-//                {1, 0, 0, 0, 1, 1, 0, 0, 1},
-//                {0, 1, 0, 1, 1, 0, 1, 0, 1},
-//                {0, 0, 1, 0, 1, 0, 0, 1, 1}
+//                {-1, 1, 1, 0, 0, 0, 0, 0, 0},
+//                {0, -1, 0, 1, 0, 0, 0, 0, 0},
+//                {0, -1, 0, 0, 1, 0, 0, 0, 0},
+//                {0, 0, -1, 0, 0, 1, 0, 0, 0},
+//                {0, 0, 0, -1, 0, 0, 1, 0, 0},
+//                {0, 0, 0, 0, -1, 0, 1, 0, 0},
+//                {0, 0, 0, 0, 0, -1, 0, 1, 0},
+//                {0, 0, 0, 0, 0, 0, -1, -1, 1},
+//                {1, 0, 0, 0, 0, 0, 0, 0, -1}
 //        };
+//        a = MatrixCalculator.T_matrix(a);
+
+        int[][] a = {
+                {1, 0, 0, 0, 1, 1, 0, 0, 1},
+                {0, 1, 0, 1, 1, 0, 1, 0, 1},
+                {0, 0, 1, 0, 1, 0, 0, 1, 1}
+        };
 
         MatrixSolver matrixSolver = new MatrixSolver();
         matrixSolver.solve(a);
