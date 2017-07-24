@@ -36,10 +36,12 @@ public class InvarientMiner {
         for (String trace : traces.getTraces().values()) {
             for (int i = 0; i < trace.length(); i++) {
                 Character sign = trace.charAt(i);
+                System.out.print(sign);
                 if (i == 0) {
                     start.add(sign);
                 }
             }
+            System.out.println();
         }
 
         int[][] matrix = MatrixCalculator.transformNet2Matrix(basic);

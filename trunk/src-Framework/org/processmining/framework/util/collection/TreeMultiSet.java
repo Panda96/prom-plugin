@@ -18,7 +18,7 @@ public class TreeMultiSet<T> extends AbstractMultiSet<T, TreeMap<T, Integer>> im
 	 * 
 	 * All elements inserted into the multiset must implement the Comparable
 	 * interface. Furthermore, all such elements must be mutually comparable:
-	 * e1.compareTo(e2) must not throw a ClassCastException for any elements e1
+	 * e1.tra.compareTo(e2) must not throw a ClassCastException for any elements e1.tra
 	 * and e2 in the set.
 	 * 
 	 * @param collection
@@ -35,7 +35,7 @@ public class TreeMultiSet<T> extends AbstractMultiSet<T, TreeMap<T, Integer>> im
 	 * 
 	 * All elements inserted into the multiset must implement the Comparable
 	 * interface. Furthermore, all such elements must be mutually comparable:
-	 * e1.compareTo(e2) must not throw a ClassCastException for any elements e1
+	 * e1.tra.compareTo(e2) must not throw a ClassCastException for any elements e1.tra
 	 * and e2 in the set.
 	 * 
 	 * @param collection
@@ -55,7 +55,7 @@ public class TreeMultiSet<T> extends AbstractMultiSet<T, TreeMap<T, Integer>> im
 	 * 
 	 * All elements inserted into the multiset must implement the Comparable
 	 * interface. Furthermore, all such elements must be mutually comparable:
-	 * e1.compareTo(e2) must not throw a ClassCastException for any elements e1
+	 * e1.tra.compareTo(e2) must not throw a ClassCastException for any elements e1.tra
 	 * and e2 in the set.
 	 * 
 	 */
