@@ -49,6 +49,14 @@ public class InvarientMiner {
         Set<int[]> t_tmp = MatrixCalculator.rightCalculate(matrix);
         Set<int[]> t_invariant = new HashSet<>();
 
+        System.out.println("matrix");
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                System.out.print(matrix[i][j]+"\t");
+            }
+            System.out.println();
+        }
+
         for (int[] each : t_tmp) {
             int tmp = 0;
             for (char c : start) {
@@ -67,9 +75,32 @@ public class InvarientMiner {
             }
         }
 
+        System.out.println("before remove");
+        for (int[]each:t_invariant) {
+            for (int i = 0; i < each.length; i++) {
+                System.out.print(each[i]);
+            }
+            System.out.println();
+        }
+
         Set<int[]> t_avail = generateAvail(traces, t_invariant);
         t_invariant.removeAll(t_avail);
 
+        System.out.println("t_avail");
+        for (int[]each:t_avail) {
+            for (int i = 0; i < each.length; i++) {
+                System.out.print(each[i]);
+            }
+            System.out.println();
+        }
+
+        System.out.println("after remove");
+        for (int[]each:t_invariant) {
+            for (int i = 0; i < each.length; i++) {
+                System.out.print(each[i]);
+            }
+            System.out.println();
+        }
         Set<int[]> pvs;
         if (t_avail.isEmpty()) {
             pvs = new HashSet<>();
@@ -78,13 +109,10 @@ public class InvarientMiner {
                     (MatrixCalculator.matrixSet2Array(t_avail)));
         }
 
+
         int[][] non_avail = MatrixCalculator.matrixSet2Array(t_invariant);
         if (non_avail == null) {
             return basic;
-        }
-
-        for (int[] each : pvs) {
-            positiveFirst(each);
         }
 
         Set<int[]> pvsa = new HashSet<>();
@@ -94,8 +122,15 @@ public class InvarientMiner {
             }
         }
 
+        System.out.println("Pvsa");
+        for (int[] each:pvsa){
+            for (int i = 0; i < each.length; i++) {
+                System.out.print(each[i]);
+            }
+            System.out.println();
+        }
         // 修正PVSa
-        pvsa = modifyPVSa(pvsa);
+//        pvsa = modifyPVSa(pvsa);
 
         EnhancedAlphaMinerView view = new EnhancedAlphaMinerView();
         view.addLostPlaces(pvsa, basic);
@@ -138,39 +173,6 @@ public class InvarientMiner {
         return true;
     }
 
-    private static void positiveFirst(int[] a) {
-        boolean posiFirst = true;
-        for (int i = 0; i < a.length; i++) {
-            if (a[i] == -1) {
-                posiFirst = false;
-                break;
-            } else if (a[i] == 1) {
-                break;
-            }
-        }
-        if (!posiFirst)
-            for (int i = 0; i < a.length; i++) {
-                a[i] = -a[i];
-            }
-    }
-
-    private static Set<int[]> modifyPVSa(Set<int[]> origin) {
-        Set<int[]> result = new HashSet<>();
-        List<int[]> invalid = new ArrayList<>();
-        for (int[] each : origin) {
-            if (isValidPVSa(each)) {
-                result.add(each);
-            } else {
-                invalid.add(each);
-            }
-        }
-
-        if (invalid.size() <= 1) {
-            return result;
-        } else {
-            return null;
-        }
-    }
 
     private static boolean isValidPVSa(int[] pv) {
         // 1

@@ -2,6 +2,7 @@ package cn.edu.nju.software.cripsylamp.beta;
 
 import cn.edu.nju.software.cripsylamp.beans.Trace;
 import cn.edu.nju.software.cripsylamp.plugins.EnhancedAlphaMiner;
+import cn.edu.nju.software.cripsylamp.plugins.InvarientMiner;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
@@ -43,19 +44,21 @@ public class BetaMiner {
     public Petrinet mine(UIPluginContext context, XLog log) {
         Petrinet result = mineIt(log);
 
-//        Map<String, String> map = new HashMap<>();
-//        int i = 0;
-//        for (XTrace xEvents : log) {
-//            String trace = "";
-//            for (XEvent xEvent : xEvents) {
-//                String name = xEvent.getAttributes().get("concept:name").toString();
-//                trace += name;
-//            }
-//            map.put(i++ + "", trace.trim());
-//        }
-//
-//        Trace trace = new Trace(map);
-//        result = EnhancedAlphaMiner.findLostPlaces(result, trace);
+        Map<String, String> map = new HashMap<>();
+        int i = 0;
+        for (XTrace xEvents : log) {
+            String trace = "";
+            for (XEvent xEvent : xEvents) {
+                String name = xEvent.getAttributes().get("concept:name").toString();
+                if (!trace.contains(name))
+                    trace += name;
+            }
+            System.out.println(trace.trim());
+            map.put(i++ + "", trace.trim());
+        }
+
+        Trace trace = new Trace(map);
+        result = InvarientMiner.findLostPlaces(result, trace);
         return result;
     }
 

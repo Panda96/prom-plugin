@@ -1,8 +1,10 @@
 package cn.edu.nju.software.cripsylamp.plugins;
 
 import cn.edu.nju.software.cripsylamp.util.Tuple;
+import org.processmining.models.graphbased.directed.DirectedGraphNode;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
+import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetFactory;
@@ -66,6 +68,9 @@ public class EnhancedAlphaMinerView {
     }
 
     public void addLostPlaces(Set<int[]> PVSa, Petrinet ori) {
+        if (PVSa == null || PVSa.size() == 0) {
+            return;
+        }
         Collection<Transition> all = ori.getTransitions();
         Collection<Place> placeCollection = ori.getPlaces();
         int placeCnt = placeCollection.size();
@@ -73,57 +78,108 @@ public class EnhancedAlphaMinerView {
 
         char reach_char = 'A';
         for (Transition transition : all) {
-            if(transition.getLabel().charAt(0)!='i') {
+            if (transition.getLabel().charAt(0) != 'i') {
                 tansitionMap.put(transition.getLabel().charAt(0) + "", transition);
                 reach_char = transition.getLabel().charAt(0);
                 System.out.println("reach_char = " + reach_char);
             }
         }
         for (Transition transition : all) {
-            if(transition.getLabel().charAt(0)=='i') {
-                tansitionMap.put((char)(++reach_char)+"", transition);
-//                System.out.println("reach_char+(1) = " + (++reach_char));
-//                reach_char++;
+            if (transition.getLabel().charAt(0) == 'i') {
+                tansitionMap.put((char) (++reach_char) + "", transition);
             }
         }
 
-        for (String key:tansitionMap.keySet()){
+        for (String key : tansitionMap.keySet()) {
             System.out.print(key);
         }
         System.out.println();
         for (int[] each : PVSa) {
             System.out.println("Pvsa:");
             for (int i = 0; i < each.length; i++) {
-                System.out.print(each[i]+"\t");
+                System.out.print(each[i] + "\t");
             }
             System.out.println("-----------");
             Place place = ori.addPlace("p" + placeCnt++);
             boolean leftAdd = false;
             boolean rightAdd = false;
+            char labelIn = ' ', labelOut = ' ';
+//            for (int i = 0; i < each.length - 1; i++) {
+//                char label = (char) ('A' + i);
+//                if (each[i] == 1) {
+//                    System.out.println("label+\"\" = " + label + "");
+//                    ori.addArc(tansitionMap.get(label + ""), place);
+//                    leftAdd = true;
+//                } else if (each[i] == -1) {
+//                    ori.addArc(place, tansitionMap.get(label + ""));
+//                    rightAdd = true;
+//                }
+//            }
             for (int i = 0; i < each.length - 1; i++) {
-                char label = (char) ('A' + i);
                 if (each[i] == 1) {
-                    System.out.println("label+\"\" = " + label+"");
-                    ori.addArc(tansitionMap.get(label + ""), place);
+                    labelIn = (char) ('A' + i);
+                    System.out.println("label+\"\" = " + labelIn + "");
                     leftAdd = true;
                 } else if (each[i] == -1) {
-                    ori.addArc(place, tansitionMap.get(label + ""));
+                    labelOut = (char) ('A' + i);
                     rightAdd = true;
                 }
             }
-            if (!(leftAdd&&rightAdd)){
-                for (PetrinetEdge e:ori.getInEdges(place)) {
-                    System.out.println(e.getLabel());
-                    ori.removeEdge(e);
-                }
-                for (PetrinetEdge e:ori.getOutEdges(place)) {
-                    System.out.println(e.getLabel());
-                    ori.removeEdge(e);
-                }
-                System.out.println("place.getLabel() = " + place.getLabel());
+            if (!(leftAdd && rightAdd)) {
                 ori.removePlace(place);
-                placeCnt--;
             }
+//            if (!(leftAdd && rightAdd)) {
+//                for (PetrinetEdge e : ori.getInEdges(place)) {
+//                    System.out.println(e.getLabel());
+//                    ori.removeEdge(e);
+//                }
+//                for (PetrinetEdge e : ori.getOutEdges(place)) {
+//                    System.out.println(e.getLabel());
+//                    ori.removeEdge(e);
+//                }
+//                System.out.println("place.getLabel() = " + place.getLabel());
+//                ori.removePlace(place);
+//                placeCnt--;
+//            }
+            Transition left = tansitionMap.get(labelIn + "");
+            Transition right = tansitionMap.get(labelOut + "");
+            if (leftIsBeforeRight(ori, left, right, 0)) {
+                ori.addArc(tansitionMap.get(labelIn + ""), place);
+                ori.addArc(place, tansitionMap.get(labelOut + ""));
+                System.out.println("add left to right");
+            } else {
+                ori.addArc(place, tansitionMap.get(labelIn + ""));
+                ori.addArc(tansitionMap.get(labelOut + ""), place);
+                System.out.println("add right to left");
+            }
+
+            System.out.println("add place aaa");
         }
+    }
+
+    private boolean leftIsBeforeRight(Petrinet ori, Transition left, Transition right, int time) {
+        boolean leftBeforeRight = false;
+        Transition tmp = left;
+        if (ori.getOutEdges(tmp) == null) {
+            return false;
+        }
+        for (PetrinetEdge e : ori.getOutEdges(tmp)) {
+            for (PetrinetEdge out : ori.getOutEdges((DirectedGraphNode) e.getTarget())) {
+                if (out.getTarget() == right) {
+                    return true;
+                } else {
+                    if (time == 10) {
+                        return false;
+                    } else {
+                        leftBeforeRight = leftBeforeRight || leftIsBeforeRight(ori, (Transition) out.getTarget(), right, time + 1);
+                        if (leftBeforeRight) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+        }
+        return leftBeforeRight;
     }
 }

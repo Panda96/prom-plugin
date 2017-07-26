@@ -83,7 +83,14 @@ public class ModifiedAlphaPpSharpMiner {
 
         Trace trace = new Trace(map);//initial trace
 
+
+
         Pair<Trace,Petrinet> pair = LogGenerator.SimpleTraceGenerator(trace,petrinet);//new trace and named petrinet
+
+
+        for (Map.Entry<String, String> entry : pair.getFirst().getTraces().entrySet()) {
+            System.out.println(entry.getValue());
+        }
 
         petrinet = InvarientMiner.findLostPlaces(pair.getSecond(), pair.getFirst());
 

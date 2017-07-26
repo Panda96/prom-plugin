@@ -225,44 +225,116 @@ public class MatrixSolver {
 
     private static Set<int[]> adjustResult(Set<int[]> preResult) {
         Set<int[]> result = new HashSet<>();
-        preResult.forEach(e -> {
+        for (int[] e : preResult) {
             if (onePositiveOneNegative(e)) {
                 result.add(e);
             } else {
-                int[] tmp1 = e.clone();
-                int[] tmp2 = e.clone();
                 int preLength = result.size();
-                preResult.forEach(a -> {
+                for (int[] a : preResult) {
+                    int[] tmp1 = Arrays.copyOf(e, e.length);
+                    int[] tmp2 = Arrays.copyOf(e, e.length);
                     for (int i = 0; i < a.length; i++) {
                         tmp1[i] += a[i];
                         tmp2[i] -= a[i];
                     }
                     if (onePositiveOneNegative(tmp1)) {
                         result.add(tmp1);
-                        return;
+                        break;
                     } else if (onePositiveOneNegative(tmp2)) {
                         result.add(tmp2);
-                        return;
+                        break;
                     }
-                });
+                }
+                ;
                 if (preLength == result.size()) {
                     result.add(e);
                 }
             }
-        });
+        }
+
+        for (int[] each : result) {
+            positiveFirst(each);
+        }
+        result = removeSame(result);
+        System.out.println("adjust result");
+        for (int[] each : result) {
+            for (int i = 0; i < each.length; i++) {
+                System.out.print(each[i] + "\t");
+            }
+            System.out.println();
+        }
+
         return result;
+    }
+
+    private static Set<int[]> removeSame(Set<int[]> oriSet) {
+        Set<int[]> resultSet = new HashSet<>();
+        if (oriSet==null||oriSet.size()<=1){
+            return oriSet;
+        }
+        List<CompareIntSet> compareList = new ArrayList<>();
+        for (int[] each:oriSet) {
+            CompareIntSet e = new CompareIntSet(each);
+            compareList.add(e);
+        }
+        for (int i = 0; i <compareList.size(); i++) {
+            if (compareList.get(i).hasSame){
+                continue;
+            }
+            for (int j = i+1; j < compareList.size(); j++) {
+                if (compareList.get(j).hasSame){
+                    continue;
+                }
+                int [] seti = compareList.get(i).getIntSet();
+                int [] setj = compareList.get(j).getIntSet();
+                boolean same = true;
+                for (int k = 0; k < seti.length; k++) {
+                    if (seti[k]!=setj[k]){
+                        same = false;
+                    }
+                }
+                if (same){
+                    compareList.get(j).setHasSame(true);
+                }
+            }
+            resultSet.add(compareList.get(i).getIntSet());
+        }
+        return resultSet;
     }
 
     private static boolean onePositiveOneNegative(int[] numbers) {
         int positive = 0, negative = 0;
-        for (int i = 0; i < numbers.length; i++) {
-            if (numbers[i] > 0) {
+        for (int i = 0; i < numbers.length - 2; i++) {
+            if (numbers[i] == 1) {
                 positive++;
-            } else if (numbers[i] < 0) {
+            } else if (numbers[i] == -1) {
                 negative++;
+            } else if (numbers[i] != 0) {
+                return false;
+            }
+        }
+        for (int i = numbers.length - 2; i < numbers.length; i++) {
+            if (numbers[i] != 0) {
+                return false;
             }
         }
         return (positive == 1) && (negative == 1);
+    }
+
+    private static void positiveFirst(int[] a) {
+        boolean posiFirst = true;
+        for (int i = 0; i < a.length; i++) {
+            if (a[i] == -1) {
+                posiFirst = false;
+                break;
+            } else if (a[i] == 1) {
+                break;
+            }
+        }
+        if (!posiFirst)
+            for (int i = 0; i < a.length; i++) {
+                a[i] = -a[i];
+            }
     }
 
     private static int allZeroExcept(int cNum, int[][] matrix) {
