@@ -3,13 +3,9 @@ package cn.edu.nju.software.cripsylamp.logRepair;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
-import org.processmining.models.graphbased.directed.petrinet.elements.Place;
-import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author keenan on 25/10/2017
@@ -31,88 +27,14 @@ public class LogRepairPlugin {
 
 
     public Petrinet logRepairPlugin(UIPluginContext context) {
-        ArrayList<ConnectItem> connectItems = new ArrayList<>();
+        String ADJ_LIST="adjacency_list.txt";
+        String LOOP="loop.txt";
 
-        // 第一项
-        HashSet<String> cur_1 = new HashSet<>();
-        cur_1.add("A");
-        HashSet<HashSet<String>> pre_1 = null;
-        HashSet<String> succ_1_1 = new HashSet<>();
-        succ_1_1.add("B");
-        succ_1_1.add("C");
-        HashSet<String> succ_1_2 = new HashSet<>();
-        succ_1_2.add("D");
-        HashSet<HashSet<String>> succ_1 = new HashSet<>();
-        succ_1.add(succ_1_1);
-        succ_1.add(succ_1_2);
-        connectItems.add(new ConnectItem(cur_1, pre_1, succ_1));
+        List<String> adj_content = readFile(ADJ_LIST);
+        List<ConnectItem> connectItems = parseConnectItem(adj_content);
 
-        // 第二项
-        HashSet<String> cur_2 = new HashSet<>();
-        cur_2.add("B");
-        cur_2.add("C");
-        HashSet<HashSet<String>> pre_2 = new HashSet<>();
-        HashSet<String> pre_2_1 = new HashSet<>();
-        pre_2_1.add("A");
-        pre_2.add(pre_2_1);
-        HashSet<String> succ_2_1 = new HashSet<>();
-        succ_2_1.add("E");
-        HashSet<HashSet<String>> succ_2 = new HashSet<>();
-        succ_2.add(succ_2_1);
-        connectItems.add(new ConnectItem(cur_2, pre_2, succ_2));
-
-        // 第三项
-        HashSet<String> cur_3 = new HashSet<>();
-        cur_3.add("D");
-        HashSet<HashSet<String>> pre_3 = new HashSet<>();
-        HashSet<String> pre_3_1 = new HashSet<>();
-        pre_3_1.add("A");
-        pre_3.add(pre_3_1);
-        HashSet<HashSet<String>> succ_3 = new HashSet<>();
-        HashSet<String> succ_3_1 = new HashSet<>();
-        succ_3_1.add("E");
-        succ_3.add(succ_3_1);
-        connectItems.add(new ConnectItem(cur_3, pre_3, succ_3));
-
-        // 第四项
-        HashSet<String> cur_4 = new HashSet<>();
-        cur_4.add("E");
-        HashSet<HashSet<String>> pre_4 = new HashSet<>();
-        HashSet<String> pre_4_1 = new HashSet<>();
-        pre_4_1.add("B");
-        pre_4_1.add("C");
-        HashSet<String> pre_4_2 = new HashSet<>();
-        pre_4_2.add("D");
-        pre_4.add(pre_4_1);
-        pre_4.add(pre_4_2);
-        HashSet<HashSet<String>> succ_4 = null;
-        connectItems.add(new ConnectItem(cur_4, pre_4, succ_4));
-
-        // loop
-        List<LoopStructure> loopStructures = new ArrayList<>();
-
-        LoopStructure loopStructure1 = new LoopStructure();
-        String new_Task_1 = "ab";
-        HashSet<String> pre_Task_1 = new HashSet<>();
-        pre_Task_1.add("B");
-        HashSet<String> post_Task_1 = new HashSet<>();
-        post_Task_1.add("C");
-        loopStructure1.setNewTask(new_Task_1);
-        loopStructure1.setPre_task(pre_Task_1);
-        loopStructure1.setPost_task(post_Task_1);
-
-        LoopStructure loopStructure2 = new LoopStructure();
-        String new_Task_2 = "cd";
-        HashSet<String> pre_Task_2 = new HashSet<>();
-        pre_Task_2.add("D");
-        HashSet<String> post_Task_2 = new HashSet<>();
-        post_Task_2.add("E");
-        loopStructure2.setNewTask(new_Task_2);
-        loopStructure2.setPre_task(pre_Task_2);
-        loopStructure2.setPost_task(post_Task_2);
-
-        loopStructures.add(loopStructure1);
-        loopStructures.add(loopStructure2);
+        List<String> loop_content = readFile(LOOP);
+        List<LoopStructure> loopStructures = parseLoopStructure(loop_content);
 
         Table2Petrinet table2Petrinet = new Table2Petrinet();
         Petrinet petrinet = table2Petrinet.tranfer2net(connectItems, loopStructures);
@@ -120,18 +42,101 @@ public class LogRepairPlugin {
         return petrinet;
     }
 
-    public static void main(String[] args) {
-        LogRepairPlugin plugin = new LogRepairPlugin();
-        Petrinet petrinet = plugin.logRepairPlugin(null);
-        Collection<Transition> transitions = petrinet.getTransitions();
-        Collection<Place> places = petrinet.getPlaces();
-
-        for (Transition transition : transitions) {
-            System.out.print(transition.getLabel() + "\t");
+    /**
+     * 读文件
+     *
+     * @param path
+     * @return
+     */
+    private List<String> readFile(String path) {
+        File file = new File(path);
+        List<String> content = new ArrayList<>();
+        BufferedReader bufferedReader = null;
+        try {
+            bufferedReader = new BufferedReader(new FileReader(file));
+            String line = "";
+            while ((line = bufferedReader.readLine()) != null) {
+                content.add(line);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
-        for (Place place : places) {
-            System.out.print(place.getLabel() + "\t");
+        return content;
+    }
+
+    /**
+     * 解析邻接表
+     *
+     * @param content
+     * @return
+     */
+    private List<ConnectItem> parseConnectItem(List<String> content) {
+        List<ConnectItem> connectItems = new ArrayList<>();
+
+        for (int i = 1; i < content.size(); i++) {
+            ConnectItem connectItem = new ConnectItem();
+
+            String line = content.get(i);
+            System.out.println("line = " + line);
+            String[] components = line.split("\t");
+
+            HashSet<String> cur = new HashSet<>(Arrays.asList(components[0].split(" ")));
+            connectItem.setTaskSet(cur);
+
+            HashSet<HashSet<String>> pre = new HashSet<>();
+            String[] pres = components[1].split(" ");
+            for (String pres_item : pres) {
+                pre.add(new HashSet<>(Arrays.asList(pres_item.split(","))));
+            }
+            connectItem.setPrecursor(pre);
+
+            HashSet<HashSet<String>> succ = new HashSet<>();
+            String[] succs = components[2].split(" ");
+            for (String succs_item : succs) {
+                succ.add(new HashSet<>(Arrays.asList(succs_item.split(","))));
+            }
+            connectItem.setSuccessor(succ);
+            connectItems.add(connectItem);
         }
+
+        return connectItems;
+    }
+
+    /**
+     * 解析循环结构
+     *
+     * @param content
+     * @return
+     */
+    private List<LoopStructure> parseLoopStructure(List<String> content) {
+        List<LoopStructure> loopStructures = new ArrayList<>();
+
+        for (int i = 1; i < content.size(); i++) {
+            LoopStructure loopStructure = new LoopStructure();
+            String line = content.get(i);
+            System.out.println(line);
+            String[] components = line.split("\t");
+
+            loopStructure.setNewTask(components[0]);
+            String[] pres = components[1].split(" ");
+            HashSet<String> pre = new HashSet<>(Arrays.asList(pres));
+            String[] succs = components[2].split(" ");
+            HashSet<String> succ = new HashSet<>(Arrays.asList(succs));
+            loopStructure.setPre_task(pre);
+            loopStructure.setPost_task(succ);
+            loopStructures.add(loopStructure);
+        }
+        return loopStructures;
     }
 }

@@ -1,0 +1,5 @@
+C	pre	such
+A	 	B,C D
+B C	A	E
+D	A	E
+E	B,C D	 

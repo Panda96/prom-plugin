@@ -1,0 +1,14 @@
+cur	pre	such
+A	 	B,C D
+B C	A	E
+E	B,C	G
+D	A	F
+F	D	G
+G	E F	H
+H	G	J
+J	H	M K
+M	J	N
+N	M	P
+K	J	L
+L	K	P
+P	L N	 
