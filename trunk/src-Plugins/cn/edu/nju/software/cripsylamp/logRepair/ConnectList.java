@@ -1,10 +1,13 @@
 package cn.edu.nju.software.cripsylamp.logRepair;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 /**
- * @author keenan on 25/10/2017
+ * @author keenan on 21/10/2017
  */
 public class ConnectList {
-    //    ArrayList<ConnectItem> List = new ArrayList<ConnectItem>();
+//    ArrayList<ConnectItem> List = new ArrayList<ConnectItem>();
 //
 //    private static void updatePrecursor(HashSet<String> task_set, HashSet<String> suc) {
 //        //add suc to the successor of the record whose task_set is task_set
@@ -109,4 +112,7 @@ public class ConnectList {
 //        }
 //        return in;
 //    }
+
+
+
 }

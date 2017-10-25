@@ -10,8 +10,11 @@ import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetFactor
 import java.util.*;
 
 /**
- * @author keenan on 25/10/2017
+ * transfer adjacency list to Petri Net
+ *
+ * @author keenan on 21/10/2017
  */
+@SuppressWarnings("Duplicates")
 public class Table2Petrinet {
     /**
      * transfer adjacency list to Petri Net
@@ -19,7 +22,7 @@ public class Table2Petrinet {
      * @param table adjacency list
      * @return Petri Net
      */
-    public Petrinet tranfer2net(List<ConnectItem> table) {
+    public Petrinet tranfer2net(List<ConnectItem> table, List<LoopStructure> loopStructures) {
         int p_cnt = 0;
         Petrinet petrinet = PetrinetFactory.newPetrinet("petri");
         Map<String, Transition> stringTransitionMap = new HashMap<>();
@@ -27,8 +30,6 @@ public class Table2Petrinet {
         Map<Transition, List<Set<Transition>>> transitionSetListMap = new HashMap<>();
 
         for (ConnectItem item : table) {
-            printSet(item.getTaskSet());
-
             // 对于没有前驱任务的任务集合T0，
             // 对于其中的每一个任务t，
             // 创建一个库所p，创建一个名字是t的变迁，创建一条弧连接
@@ -209,67 +210,77 @@ public class Table2Petrinet {
                     }
                 }
             }
-//            printMap(stringTransitionMap);
-//            for (int i = 0; i < m; i++) {
-//                places.add(petrinet.addPlace((p_cnt++) + ""));
-//            }
-//
-//            List<List<String>> lists = new ArrayList<>();
-//            List<Integer> index = new ArrayList<>();
-//            for (HashSet<String> strings : succ) {
-//                lists.add(new ArrayList<>(strings));
-//                index.add(0);
-//            }
-//
-//            // 创建新变迁，把m个库所连到新变迁
-//            for (Place place : places) {
-//                for (int i = 0; i < lists.size(); i++) {
-//                    String s = lists.get(i).get(index.get(i));
-//                    Transition transition = stringTransitionMap.get(s);
-//                    if (transition == null) {
-//                        transition = petrinet.addTransition(s);
-//                        transitionSetListMap.put(transition, new ArrayList<>());
-//                        stringTransitionMap.put(s, transition);
-//                    }
-//                    petrinet.addArc(place, transition);
-//                    succTransitions.add(transition);
-//                }
-//
-//
-//                for (int i = index.size() - 1; i >= 0; i--) {
-//                    if (index.get(i) == lists.get(i).size() - 1) {
-//                        index.set(i, 0);
-//                    } else {
-//                        index.set(i, index.get(i) + 1);
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            // t->t_next
-//            for (Transition succTransition : succTransitions) {
-//                List<Set<Transition>> tranSetList = transitionSetListMap.get(succTransition);
-//                if (tranSetList.isEmpty()) {
-//                    for (Transition cur : currentTransitions) {
-//                        Set<Transition> init = new HashSet<>();
-//                        init.add(cur);
-//                        tranSetList.add(init);
-//                    }
-//                } else {
-//                    List<Set<Transition>> newTransitionSetList = new ArrayList<>();
-//                    for (Set<Transition> transitionSet : tranSetList) {
-//                        for (Transition cur : currentTransitions) {
-//                            Set<Transition> newTransitionSet = new HashSet<>();
-//                            newTransitionSet.addAll(transitionSet);
-//                            newTransitionSet.add(cur);
-//                            newTransitionSetList.add(newTransitionSet);
-//                        }
-//                    }
-//                    transitionSetListMap.put(succTransition, newTransitionSetList);
-//                }
-//            }
         }
 
+
+        // 找循环
+        for (LoopStructure loop : loopStructures) {
+            String new_Task = loop.getNewTask();
+
+            String first = new_Task.substring(0, 1);
+            Transition first_transition = stringTransitionMap.get(first);
+            if (first_transition == null) {
+                first_transition = petrinet.addTransition(first);
+                stringTransitionMap.put(first, first_transition);
+            }
+            String last = new_Task.substring(new_Task.length() - 1, new_Task.length());
+            Transition last_transition = stringTransitionMap.get(last);
+            if (last_transition == null) {
+                last_transition = petrinet.addTransition(last);
+                stringTransitionMap.put(last, last_transition);
+            }
+
+            Transition previous = first_transition;
+            for (int i = 1; i < new_Task.length(); i++) {
+                String label = String.valueOf(new_Task.charAt(i));
+                Transition transition = stringTransitionMap.get(label);
+                if (transition == null) {
+                    transition = petrinet.addTransition(label);
+                    stringTransitionMap.put(label, transition);
+                }
+
+                Place place = petrinet.addPlace((p_cnt++) + "");
+                petrinet.addArc(previous, place);
+                petrinet.addArc(place, transition);
+                previous = transition;
+            }
+
+            // first 和 pre
+            Set<String> pre_parallels = findParallel(loop.getPreTask(), table);
+            Set<Transition> pre_para_transitions = new HashSet<>();
+            for (String pre_parallel : pre_parallels) {
+                Transition transition = stringTransitionMap.get(pre_parallel);
+                if (transition == null) {
+                    continue;
+                } else {
+                    pre_para_transitions.add(transition);
+                }
+            }
+
+            Set<Place> pre_para_post_places = findPostPlaces(pre_para_transitions, petrinet);
+            for (Place place : pre_para_post_places) {
+                petrinet.addArc(place, first_transition);
+            }
+
+            // last 和 post
+            Set<String> post_paralles = findParallel(loop.getPostTask(), table);
+            Set<Transition> post_para_transitions = new HashSet<>();
+            for (String post_parallel : post_paralles) {
+                Transition transition = stringTransitionMap.get(post_parallel);
+                if (transition == null) {
+                    continue;
+                } else {
+                    post_para_transitions.add(transition);
+                }
+            }
+
+            Set<Place> post_para_pre_places = findPrePalces(post_para_transitions, petrinet);
+            for (Place place : post_para_pre_places) {
+                petrinet.addArc(last_transition, place);
+            }
+
+
+        }
         return petrinet;
     }
 
@@ -319,6 +330,42 @@ public class Table2Petrinet {
         return false;
     }
 
+    /**
+     * 寻找并发
+     *
+     * @param a
+     * @param table
+     * @return
+     */
+    private Set<String> findParallel(Set<String> a, List<ConnectItem> table) {
+        Set<String> parallels = new HashSet<>();
+        for (int i = 0; i < table.size(); i++) {
+            ConnectItem connectItem = table.get(i);
+            HashSet<HashSet<String>> succ = connectItem.getSuccessor();
+            HashSet<HashSet<String>> pre = connectItem.getPrecursor();
+            if (succ != null) {
+
+                for (HashSet<String> set : succ) {
+                    for (String s : set) {
+                        if (a.contains(s)) {
+                            parallels.addAll(set);
+                        }
+                    }
+                }
+            }
+            if (pre != null) {
+                for (HashSet<String> set : pre) {
+                    for (String s : set) {
+                        if (a.contains(s)) {
+                            parallels.addAll(set);
+                        }
+                    }
+                }
+            }
+        }
+        return parallels;
+    }
+
     private int getSuccSize(Transition t, Petrinet petrinet) {
         return petrinet.getOutEdges(t).size();
     }
@@ -347,12 +394,27 @@ public class Table2Petrinet {
         return samePlaces;
     }
 
-    private void printSet(Set<String> set) {
-        System.out.println("printSet: ");
-        for (String e : set) {
-            System.out.print(e.toString() + "\t");
+    private Set<Place> findPostPlaces(Set<Transition> transitions, Petrinet petrinet) {
+        Set<Place> places = new HashSet<>();
+        for (Transition transition : transitions) {
+            Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> transitionEdgeCollection = petrinet.getOutEdges(transition);
+            for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : transitionEdgeCollection) {
+                places.add((Place) edge.getTarget());
+            }
         }
-        System.out.println();
+
+        return places;
+    }
+
+    private Set<Place> findPrePalces(Set<Transition> transitions, Petrinet petrinet) {
+        Set<Place> places = new HashSet<>();
+        for (Transition transition : transitions) {
+            Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> transitionEdgeCollection = petrinet.getInEdges(transition);
+            for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : transitionEdgeCollection) {
+                places.add((Place) edge.getSource());
+            }
+        }
+        return places;
     }
 
     private void printMap(Map<String, Transition> transitionMap) {

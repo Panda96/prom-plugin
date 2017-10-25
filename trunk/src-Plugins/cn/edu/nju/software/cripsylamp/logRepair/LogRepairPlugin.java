@@ -9,6 +9,7 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Transition
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * @author keenan on 25/10/2017
@@ -87,8 +88,34 @@ public class LogRepairPlugin {
         HashSet<HashSet<String>> succ_4 = null;
         connectItems.add(new ConnectItem(cur_4, pre_4, succ_4));
 
+        // loop
+        List<LoopStructure> loopStructures = new ArrayList<>();
+
+        LoopStructure loopStructure1 = new LoopStructure();
+        String new_Task_1 = "ab";
+        HashSet<String> pre_Task_1 = new HashSet<>();
+        pre_Task_1.add("B");
+        HashSet<String> post_Task_1 = new HashSet<>();
+        post_Task_1.add("C");
+        loopStructure1.setNewTask(new_Task_1);
+        loopStructure1.setPre_task(pre_Task_1);
+        loopStructure1.setPost_task(post_Task_1);
+
+        LoopStructure loopStructure2 = new LoopStructure();
+        String new_Task_2 = "cd";
+        HashSet<String> pre_Task_2 = new HashSet<>();
+        pre_Task_2.add("D");
+        HashSet<String> post_Task_2 = new HashSet<>();
+        post_Task_2.add("E");
+        loopStructure2.setNewTask(new_Task_2);
+        loopStructure2.setPre_task(pre_Task_2);
+        loopStructure2.setPost_task(post_Task_2);
+
+        loopStructures.add(loopStructure1);
+        loopStructures.add(loopStructure2);
+
         Table2Petrinet table2Petrinet = new Table2Petrinet();
-        Petrinet petrinet = table2Petrinet.tranfer2net(connectItems);
+        Petrinet petrinet = table2Petrinet.tranfer2net(connectItems, loopStructures);
 
         return petrinet;
     }
